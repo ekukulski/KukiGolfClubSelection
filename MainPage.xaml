@@ -1,0 +1,82 @@
+﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GolfClubSelectionApp.MainPage"
+             Title="Golf Club Selection">
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="12">
+
+            <!-- Course Picker -->
+            <Picker x:Name="coursePicker"
+                    Title="Select Course" />
+
+            <!-- Course Info Panel -->
+            <StackLayout x:Name="courseInfoPanel" IsVisible="False" Spacing="4">
+                <Label x:Name="courseNameLabel"
+                       FontAttributes="Bold"
+                       FontSize="18"/>
+                <Label x:Name="courseDetailsLabel"
+                       FontSize="14"/>
+            </StackLayout>
+
+            <!-- Default Driver Picker -->
+            <StackLayout Orientation="Horizontal" Spacing="8" VerticalOptions="Start">
+                <Label Text="Default Driver:" VerticalOptions="Center"/>
+                <Picker x:Name="defaultDriverPicker"
+                        WidthRequest="180"
+                        VerticalOptions="Center"/>
+            </StackLayout>
+
+            <!-- Table Title Row -->
+            <Label Text="Golf Club Selection"
+                   FontAttributes="Bold"
+                   FontSize="16"
+                   HorizontalOptions="Center"
+                   Margin="0,12,0,0"/>
+
+            <!-- Action Buttons Row: Return (left), Save to PDF (right) -->
+            <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand" Spacing="12" Margin="0,0,0,8">
+                <Button Text="Return"
+                        BackgroundColor="IndianRed"
+                        TextColor="White"
+                        Clicked="OnReturnClicked"
+                        HorizontalOptions="StartAndExpand"/>
+                <Button Text="Save to PDF"
+                        x:Name="savePdfButton"
+                        Clicked="OnSaveToPdfClicked"
+                        BackgroundColor="DarkSeaGreen"
+                        TextColor="White"
+                        HorizontalOptions="End"/>
+            </StackLayout>
+
+            <!-- Single Unified Grid for Table and Change Club Row -->
+            <Grid x:Name="courseGrid"
+                  Margin="0,8,0,0"
+                  ColumnSpacing="4"
+                  RowSpacing="2"
+                  HorizontalOptions="FillAndExpand">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="2*" />
+                </Grid.ColumnDefinitions>
+            </Grid>
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

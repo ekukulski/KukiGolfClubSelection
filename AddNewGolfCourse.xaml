@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GolfClubSelectionApp.AddNewGolfCourse"
+             Title="Add New Golf Course">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="16">
+
+            <!-- Basic Course Information -->
+            <Entry x:Name="CourseNameEntry" Placeholder="Golf Course Name" />
+            <Entry x:Name="TeeEntry" Placeholder="Tee" />
+            <Entry x:Name="YardageEntry" Placeholder="Yardage" Keyboard="Numeric" />
+            <Entry x:Name="CourseParEntry" Placeholder="Course Par" Keyboard="Numeric" />
+            <Entry x:Name="CourseRatingEntry" Placeholder="Course Rating" Keyboard="Numeric" />
+            <Entry x:Name="CourseSlopeRatingEntry" Placeholder="Slope Rating" Keyboard="Numeric" />
+
+            <!-- Hole Handicaps -->
+            <Label Text="Hole Handicaps (1–18)" FontAttributes="Bold" />
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <!-- First 9 -->
+                <Entry x:Name="HoleHandicap1" Grid.Row="0" Grid.Column="0" Placeholder="1" Keyboard="Numeric"/>
+                <Entry x:Name="HoleHandicap2" Grid.Row="0" Grid.Column="1" Placeholder="2" Keyboard="Numeric"/>
+                <Entry x:Name="HoleHandicap3" Grid.Row="0" Grid.Column="2" Placeholder="3" Keyboard="Numeric"/>
+                <Entry x:Name="HoleHandicap4" Grid.Row="0" Grid.Column="3" Placeholder="4" Keyboard="Numeric"/>
+                <Entry x:Name="HoleHandicap5" Grid.Row="0" Grid.Column="4" Placeholder="5" Keyboard="Numeric"/>
+                <Entry x:Name="HoleHandicap6" Grid.Row="0" Grid.Column="5" Placeholder="6" Keyboard="Numeric"/>
+                <Entry x:Name="HoleHandicap7" Grid.Row="0" Grid.Column="6" Placeholder="7" Keyboard="Numeric"/>
+                <Entry x:Name="HoleHandicap8" Grid.Row="0" Grid.Column="7" Placeholder="8" Keyboard="Numeric"/>
+                <Entry x:Name="HoleHandicap9" Grid.Row="0" Grid.Column="8" Placeholder="9" Keyboard="Numeric"/>
+                <!-- Second 9 -->
+                <Entry x:Name="HoleHandicap10" Grid.Row="1" Grid.Column="0" Placeholder="10" Keyboard="Numeric"/>
+                <Entry x:Name="HoleHandicap11" Grid.Row="1" Grid.Column="1" Placeholder="11" Keyboard="Numeric"/>
+                <Entry x:Name="HoleHandicap12" Grid.Row="1" Grid.Column="2" Placeholder="12" Keyboard="Numeric"/>
+                <Entry x:Name="HoleHandicap13" Grid.Row="1" Grid.Column="3" Placeholder="13" Keyboard="Numeric"/>
+                <Entry x:Name="HoleHandicap14" Grid.Row="1" Grid.Column="4" Placeholder="14" Keyboard="Numeric"/>
+                <Entry x:Name="HoleHandicap15" Grid.Row="1" Grid.Column="5" Placeholder="15" Keyboard="Numeric"/>
+                <Entry x:Name="HoleHandicap16" Grid.Row="1" Grid.Column="6" Placeholder="16" Keyboard="Numeric"/>
+                <Entry x:Name="HoleHandicap17" Grid.Row="1" Grid.Column="7" Placeholder="17" Keyboard="Numeric"/>
+                <Entry x:Name="HoleHandicap18" Grid.Row="1" Grid.Column="8" Placeholder="18" Keyboard="Numeric"/>
+            </Grid>
+
+            <!-- Hole Pars -->
+            <Label Text="Hole Pars (1–18)" FontAttributes="Bold" />
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <!-- First 9 -->
+                <Entry x:Name="HolePar1" Grid.Row="0" Grid.Column="0" Placeholder="1" Keyboard="Numeric"/>
+                <Entry x:Name="HolePar2" Grid.Row="0" Grid.Column="1" Placeholder="2" Keyboard="Numeric"/>
+                <Entry x:Name="HolePar3" Grid.Row="0" Grid.Column="2" Placeholder="3" Keyboard="Numeric"/>
+                <Entry x:Name="HolePar4" Grid.Row="0" Grid.Column="3" Placeholder="4" Keyboard="Numeric"/>
+                <Entry x:Name="HolePar5" Grid.Row="0" Grid.Column="4" Placeholder="5" Keyboard="Numeric"/>
+                <Entry x:Name="HolePar6" Grid.Row="0" Grid.Column="5" Placeholder="6" Keyboard="Numeric"/>
+                <Entry x:Name="HolePar7" Grid.Row="0" Grid.Column="6" Placeholder="7" Keyboard="Numeric"/>
+                <Entry x:Name="HolePar8" Grid.Row="0" Grid.Column="7" Placeholder="8" Keyboard="Numeric"/>
+                <Entry x:Name="HolePar9" Grid.Row="0" Grid.Column="8" Placeholder="9" Keyboard="Numeric"/>
+                <!-- Second 9 -->
+                <Entry x:Name="HolePar10" Grid.Row="1" Grid.Column="0" Placeholder="10" Keyboard="Numeric"/>
+                <Entry x:Name="HolePar11" Grid.Row="1" Grid.Column="1" Placeholder="11" Keyboard="Numeric"/>
+                <Entry x:Name="HolePar12" Grid.Row="1" Grid.Column="2" Placeholder="12" Keyboard="Numeric"/>
+                <Entry x:Name="HolePar13" Grid.Row="1" Grid.Column="3" Placeholder="13" Keyboard="Numeric"/>
+                <Entry x:Name="HolePar14" Grid.Row="1" Grid.Column="4" Placeholder="14" Keyboard="Numeric"/>
+                <Entry x:Name="HolePar15" Grid.Row="1" Grid.Column="5" Placeholder="15" Keyboard="Numeric"/>
+                <Entry x:Name="HolePar16" Grid.Row="1" Grid.Column="6" Placeholder="16" Keyboard="Numeric"/>
+                <Entry x:Name="HolePar17" Grid.Row="1" Grid.Column="7" Placeholder="17" Keyboard="Numeric"/>
+                <Entry x:Name="HolePar18" Grid.Row="1" Grid.Column="8" Placeholder="18" Keyboard="Numeric"/>
+            </Grid>
+
+            <!-- Hole Yardages -->
+            <Label Text="Hole Yardages (1–18)" FontAttributes="Bold" />
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <!-- First 9 -->
+                <Entry x:Name="HoleYardage1" Grid.Row="0" Grid.Column="0" Placeholder="1" Keyboard="Numeric"/>
+                <Entry x:Name="HoleYardage2" Grid.Row="0" Grid.Column="1" Placeholder="2" Keyboard="Numeric"/>
+                <Entry x:Name="HoleYardage3" Grid.Row="0" Grid.Column="2" Placeholder="3" Keyboard="Numeric"/>
+                <Entry x:Name="HoleYardage4" Grid.Row="0" Grid.Column="3" Placeholder="4" Keyboard="Numeric"/>
+                <Entry x:Name="HoleYardage5" Grid.Row="0" Grid.Column="4" Placeholder="5" Keyboard="Numeric"/>
+                <Entry x:Name="HoleYardage6" Grid.Row="0" Grid.Column="5" Placeholder="6" Keyboard="Numeric"/>
+                <Entry x:Name="HoleYardage7" Grid.Row="0" Grid.Column="6" Placeholder="7" Keyboard="Numeric"/>
+                <Entry x:Name="HoleYardage8" Grid.Row="0" Grid.Column="7" Placeholder="8" Keyboard="Numeric"/>
+                <Entry x:Name="HoleYardage9" Grid.Row="0" Grid.Column="8" Placeholder="9" Keyboard="Numeric"/>
+                <!-- Second 9 -->
+                <Entry x:Name="HoleYardage10" Grid.Row="1" Grid.Column="0" Placeholder="10" Keyboard="Numeric"/>
+                <Entry x:Name="HoleYardage11" Grid.Row="1" Grid.Column="1" Placeholder="11" Keyboard="Numeric"/>
+                <Entry x:Name="HoleYardage12" Grid.Row="1" Grid.Column="2" Placeholder="12" Keyboard="Numeric"/>
+                <Entry x:Name="HoleYardage13" Grid.Row="1" Grid.Column="3" Placeholder="13" Keyboard="Numeric"/>
+                <Entry x:Name="HoleYardage14" Grid.Row="1" Grid.Column="4" Placeholder="14" Keyboard="Numeric"/>
+                <Entry x:Name="HoleYardage15" Grid.Row="1" Grid.Column="5" Placeholder="15" Keyboard="Numeric"/>
+                <Entry x:Name="HoleYardage16" Grid.Row="1" Grid.Column="6" Placeholder="16" Keyboard="Numeric"/>
+                <Entry x:Name="HoleYardage17" Grid.Row="1" Grid.Column="7" Placeholder="17" Keyboard="Numeric"/>
+                <Entry x:Name="HoleYardage18" Grid.Row="1" Grid.Column="8" Placeholder="18" Keyboard="Numeric"/>
+            </Grid>
+
+            <!-- Action Buttons -->
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="20" Margin="0,20,0,0">
+                <Button Text="Save" BackgroundColor="DarkSeaGreen" TextColor="White" Clicked="OnSaveClicked" />
+                <Button Text="Return" BackgroundColor="IndianRed" TextColor="White" Clicked="OnReturnClicked" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

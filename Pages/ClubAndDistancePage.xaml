@@ -1,0 +1,33 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GolfClubSelectionApp.ClubAndDistancePage"
+             Title="Edit Clubs and Distances">
+    
+    <VerticalStackLayout Padding="20" Spacing="10">
+        <CollectionView x:Name="clubListView" 
+                        ItemsSource="{Binding ClubDistances}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <HorizontalStackLayout Spacing="10">
+                        <Entry Text="{Binding Club}" 
+                               WidthRequest="120"/>
+                        <Entry Text="{Binding MaxDistance}" 
+                               WidthRequest="60" 
+                               Keyboard="Numeric"/>
+                    </HorizontalStackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        
+        <Button Text="Save Changes" 
+                Clicked="OnSaveClicked" 
+                FontSize="24"
+                BackgroundColor="DarkSeaGreen" 
+                TextColor="White"/>
+        <Button Text="Return"
+                Clicked="OnReturnClicked"
+                FontSize="24"
+                BackgroundColor="IndianRed"
+                TextColor="White"/>
+    </VerticalStackLayout>
+</ContentPage>

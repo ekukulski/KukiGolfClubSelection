@@ -1,0 +1,27 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GolfClubSelectionApp.HomePage"
+             Title="Golf Club Selection">
+    <VerticalStackLayout Padding="30" Spacing="20">
+        <Button Text="Add New Course"
+                Clicked="OnAddNewCourseClicked"
+                FontSize="24"
+                BackgroundColor="DarkSeaGreen"
+                TextColor="White"/>
+        <Button Text="Club and Distance"
+                Clicked="OnClubAndDistanceClicked"
+                FontSize="24"
+                BackgroundColor="DarkSeaGreen"
+                TextColor="White"/>
+        <Button Text="Club Selection"
+                Clicked="OnClubSelectionClicked"
+                FontSize="24"
+                BackgroundColor="DarkSeaGreen"
+                TextColor="White"/>
+        <Button Text="Exit"
+                Clicked="OnExitClicked"
+                FontSize="24"
+                BackgroundColor="IndianRed"
+                TextColor="White"/>
+    </VerticalStackLayout>
+</ContentPage>
