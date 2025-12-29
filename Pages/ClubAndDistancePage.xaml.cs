@@ -13,8 +13,7 @@ namespace GolfClubSelectionApp
         public ClubAndDistancePage()
         {
             InitializeComponent();
-            WindowCenteringService.CenterWindow(350, 800);
-
+            
             // Use FileSystem.AppDataDirectory for cross-platform compatibility
             // On Windows, this maps to LocalState: C:\Users\[Username]\AppData\Local\Packages\[PackageId]\LocalState
             clubDistancePath = Path.Combine(FileSystem.AppDataDirectory, "ClubAndDistance.txt");
@@ -64,7 +63,7 @@ namespace GolfClubSelectionApp
         {
             await Navigation.PopToRootAsync();
         }
-
+        
         private async Task ExportToOneDriveAsync()
         {
             // Implementation for exporting data to OneDrive

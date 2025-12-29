@@ -15,7 +15,6 @@ namespace GolfClubSelectionApp
         public AddNewGolfCourse()
         {
             InitializeComponent();
-            WindowCenteringService.CenterWindow(500, 975);
             
             // Use FileSystem.AppDataDirectory for cross-platform compatibility
             // On Windows, this maps to LocalState: C:\Users\[Username]\AppData\Local\Packages\[PackageId]\LocalState
@@ -84,7 +83,7 @@ namespace GolfClubSelectionApp
                 await DisplayAlert("Error", $"Failed to save course: {ex.Message}", "OK");
             }
         }
-
+        
         /// <summary>
         /// Clears all form fields after saving or reset.
         /// </summary>

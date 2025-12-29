@@ -40,8 +40,7 @@ namespace GolfClubSelectionApp
             clubDistancePath = Path.Combine(FileSystem.AppDataDirectory, "ClubAndDistance.txt");
 
             InitializeComponent();
-            WindowCenteringService.CenterWindow(2000, 1000);
-
+            
             // Import from OneDrive before loading data
             Task.Run(async () => await ImportFromOneDriveAsync()).Wait();
 
@@ -66,7 +65,7 @@ namespace GolfClubSelectionApp
 
             coursePicker.SelectedIndexChanged += OnCourseSelected;
         }
-
+        
         private void LoadClubDistances()
         {
             clubDistances.Clear();

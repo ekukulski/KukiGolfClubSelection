@@ -8,16 +8,6 @@ namespace GolfClubSelectionApp
         public HomePage()
         {
             InitializeComponent();
-            WindowCenteringService.CenterWindow(600, 600);
-        }
-        /// <summary>
-        /// Called when the page appears on screen.
-        /// Ensures the window is centered again each time it appears.
-        /// </summary>
-        protected override void OnAppearing()
-        {
-            base.OnAppearing();
-            WindowCenteringService.CenterWindow(600, 600);
         }
 
         private async void OnAddNewCourseClicked(object sender, EventArgs e)
