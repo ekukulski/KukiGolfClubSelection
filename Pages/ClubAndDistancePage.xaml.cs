@@ -13,7 +13,7 @@ namespace GolfClubSelectionApp
         public ClubAndDistancePage()
         {
             InitializeComponent();
-            WindowCenteringService.CenterWindow(350, 1000);
+            WindowCenteringService.CenterWindow(350, 800);
 
             // Use FileSystem.AppDataDirectory for cross-platform compatibility
             // On Windows, this maps to LocalState: C:\Users\[Username]\AppData\Local\Packages\[PackageId]\LocalState
