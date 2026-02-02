@@ -1,0 +1,186 @@
+================================================================================
+Golf Club Selection App - Installation Instructions
+Version 1.0.0
+================================================================================
+
+SYSTEM REQUIREMENTS:
+--------------------
+- Windows 10 version 1809 (build 17763) or later
+- Windows 11 (any version)
+- x64 (64-bit) processor
+- .NET 9.0 Runtime (included in package)
+
+================================================================================
+INSTALLATION METHODS
+================================================================================
+
+METHOD 1: AUTOMATED INSTALLATION (RECOMMENDED)
+-----------------------------------------------
+This is the easiest method and automatically installs both the certificate 
+and the application.
+
+1. Extract the entire contents of the ZIP file to a folder (e.g., Desktop)
+
+2. Right-click on "Add-AppDevPackage.ps1" 
+
+3. Select "Run with PowerShell"
+
+4. If prompted "Do you want to allow this app to make changes?", click "Yes"
+
+5. When prompted, press "Y" to install the certificate and app
+
+6. Wait for installation to complete
+
+7. The app will appear in your Start Menu as "Golf Club Selection App"
+
+
+METHOD 2: MANUAL INSTALLATION
+------------------------------
+If the automated method doesn't work, follow these steps:
+
+STEP 1: Install the Certificate
+--------------------------------
+1. Locate the file "GolfClubSelectionApp_1.0.0.0_x64.cer"
+
+2. Double-click the .cer file
+
+3. Click "Install Certificate..."
+
+4. Select "Local Machine" and click "Next"
+
+5. If prompted by User Account Control, click "Yes"
+
+6. Select "Place all certificates in the following store"
+
+7. Click "Browse" and select "Trusted People"
+
+8. Click "Next", then "Finish"
+
+9. You should see "The import was successful"
+
+STEP 2: Install the Application
+---------------------------------
+1. Locate the file "GolfClubSelectionApp_1.0.0.0_x64.msix"
+
+2. Double-click the .msix file
+
+3. Click "Install"
+
+4. Wait for installation to complete
+
+5. The app will appear in your Start Menu as "Golf Club Selection App"
+
+
+================================================================================
+FIRST-TIME SETUP
+================================================================================
+
+After installing the application, you need to set up your club distances and 
+golf courses:
+
+1. Launch "Golf Club Selection App" from the Start Menu
+
+2. On first launch, you'll see "No club data found" message
+
+3. Click "Club and Distance" button to set up your clubs:
+   - Enter each club name (e.g., "Driver", "3 Wood", "5 Iron")
+   - Enter the maximum distance for each club in yards
+   - Click "Save" when done
+
+4. Click "Add New Golf Course" to add courses:
+   - Enter course name, tee, yardage, par, rating, and slope
+   - Enter handicap, par, and yardage for all 18 holes
+   - Click "Save"
+
+5. Return to the main page and select a course to begin planning your shots
+
+
+================================================================================
+DATA FILE LOCATIONS
+================================================================================
+
+The application stores data in the following location:
+
+C:\Users\[YourUsername]\AppData\Local\Packages\com.kukigolf.golfclubselectionapp_[hash]\LocalState\
+
+Files stored:
+- GolfCourseData.txt (course information)
+- ClubAndDistance.txt (your club distances)
+
+PDF exports are saved to:
+C:\Users\[YourUsername]\Documents\Golf\GolfClubPlan.pdf
+
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+PROBLEM: "Windows protected your PC" message appears
+SOLUTION: Click "More info", then click "Run anyway"
+          This appears because the app uses a self-signed certificate.
+
+PROBLEM: Installation fails with certificate error
+SOLUTION: Ensure you installed the certificate to "Local Machine" > 
+          "Trusted People" store, not "Current User"
+
+PROBLEM: App doesn't appear after installation
+SOLUTION: 1. Press Windows key
+          2. Type "Golf Club Selection App"
+          3. Right-click and select "Pin to Start" for easy access
+
+PROBLEM: "No club data found" message won't go away
+SOLUTION: You must first enter your club distances using the 
+          "Club and Distance" button on the home page
+
+PROBLEM: Can't find saved courses
+SOLUTION: Ensure you clicked "Save" after entering course data.
+          Check the course picker dropdown on the main page.
+
+
+================================================================================
+UNINSTALLATION
+================================================================================
+
+To remove the Golf Club Selection App:
+
+1. Open Windows Settings (Windows key + I)
+
+2. Go to "Apps" > "Installed apps"
+
+3. Search for "Golf Club Selection App"
+
+4. Click the three dots (...) next to the app
+
+5. Select "Uninstall"
+
+6. Confirm by clicking "Uninstall" again
+
+Note: Your data files will remain in the AppData folder. To completely 
+remove all data, manually delete the folder mentioned in "DATA FILE LOCATIONS"
+
+
+================================================================================
+UPDATING THE APPLICATION
+================================================================================
+
+To update to a newer version:
+
+1. Uninstall the current version (see Uninstallation section above)
+
+2. Follow the installation instructions for the new version
+
+3. Your data files will be preserved automatically
+
+
+================================================================================
+SUPPORT
+================================================================================
+
+For questions or issues:
+- Developer: KukiGolf
+- Email: [Your Email Address]
+
+Application Version: 1.0.0
+Last Updated: December 22, 2024
+
+================================================================================

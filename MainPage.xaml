@@ -1,82 +1,171 @@
 ﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GolfClubSelectionApp.MainPage"
-             Title="Golf Club Selection">
-    <ScrollView>
-        <StackLayout Padding="20" Spacing="12">
+             BackgroundColor="Black">
 
-            <!-- Course Picker -->
-            <Picker x:Name="coursePicker"
-                    Title="Select Course" />
+    <ContentPage.Resources>
 
-            <!-- Course Info Panel -->
-            <StackLayout x:Name="courseInfoPanel" IsVisible="False" Spacing="4">
-                <Label x:Name="courseNameLabel"
+        <!-- Picker text styling -->
+        <Style TargetType="Picker">
+            <Setter Property="TextColor" Value="FloralWhite" />
+            <Setter Property="TitleColor" Value="FloralWhite" />
+            <Setter Property="BackgroundColor" Value="Transparent" />
+            <Setter Property="HeightRequest" Value="40" />
+        </Style>
+
+        <!-- Optional: labels outside the grid -->
+        <Style x:Key="PageLabelStyle" TargetType="Label">
+            <Setter Property="TextColor" Value="FloralWhite" />
+        </Style>
+
+    </ContentPage.Resources>
+
+    <VerticalStackLayout Padding="20" Spacing="10">
+
+        <!-- Page Title -->
+        <Label Text="Golf Club Selection"
+               HorizontalOptions="Center"
+               FontAttributes="Bold"
+               FontSize="24"
+               TextColor="FloralWhite"
+               Margin="0,0,0,10"/>
+
+        <ScrollView>
+            <StackLayout Padding="20" Spacing="12">
+
+                <!-- Course Picker (wrapped for dark background + border) -->
+                <Border BackgroundColor="#1E1E1E"
+                        Stroke="#3A3A3A"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 8"
+                        Padding="10,6">
+                    <Picker x:Name="coursePicker"
+                            Title="Select Course" />
+                </Border>
+
+                <!-- Course Info Panel -->
+                <StackLayout x:Name="courseInfoPanel" IsVisible="False" Spacing="4">
+                    <Label x:Name="courseNameLabel"
+                           FontAttributes="Bold"
+                           FontSize="18"
+                           TextColor="FloralWhite" />
+                    <Label x:Name="courseDetailsLabel"
+                           FontSize="14"
+                           TextColor="FloralWhite" />
+                </StackLayout>
+
+                <!-- Default Driver Picker -->
+                <Grid ColumnDefinitions="Auto,*"
+                      ColumnSpacing="10"
+                      VerticalOptions="Start">
+
+                    <Label Grid.Column="0"
+                           Text="Default Driver:"
+                           VerticalOptions="Center"
+                           Style="{StaticResource PageLabelStyle}" />
+
+                    <Border Grid.Column="1"
+                            BackgroundColor="#1E1E1E"
+                            Stroke="#3A3A3A"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 8"
+                            Padding="10,6"
+                            HorizontalOptions="Start">
+                        <Picker x:Name="defaultDriverPicker"
+                                WidthRequest="180"
+                                VerticalOptions="Center" />
+                    </Border>
+
+                </Grid>
+
+                <!-- Table Title Row -->
+                <Label Text="Golf Club Selection"
                        FontAttributes="Bold"
-                       FontSize="18"/>
-                <Label x:Name="courseDetailsLabel"
-                       FontSize="14"/>
+                       FontSize="16"
+                       HorizontalOptions="Center"
+                       Margin="0,12,0,0"
+                       TextColor="FloralWhite"/>
+
+                <!-- Action Buttons Row -->
+                <StackLayout Orientation="Horizontal"
+                             HorizontalOptions="FillAndExpand"
+                             Spacing="12"
+                             Margin="0,0,0,8">
+                    <Button Text="Return"
+                            BackgroundColor="IndianRed"
+                            TextColor="Black"
+                            Clicked="OnReturnClicked"
+                            HorizontalOptions="StartAndExpand"/>
+                    <Button Text="Save to PDF"
+                            x:Name="savePdfButton"
+                            Clicked="OnSaveToPdfClicked"
+                            BackgroundColor="DarkSeaGreen"
+                            TextColor="Black"
+                            HorizontalOptions="End"/>
+                </StackLayout>
+
+                <!-- Single Unified Grid for Table -->
+                <Grid x:Name="courseGrid"
+                      Margin="0,8,0,0"
+                      ColumnSpacing="4"
+                      RowSpacing="2"
+                      HorizontalOptions="FillAndExpand">
+
+                    <!-- Grid/table labels remain black by default -->
+                    <Grid.Resources>
+                        <Style TargetType="Label">
+                            <Setter Property="TextColor" Value="Black" />
+                        </Style>
+                    </Grid.Resources>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="2*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Header Row -->
+                    <Label Text="Hole" Grid.Column="0" />
+                    <Label Text="1" Grid.Column="1" />
+                    <Label Text="2" Grid.Column="2" />
+                    <Label Text="3" Grid.Column="3" />
+                    <Label Text="4" Grid.Column="4" />
+                    <Label Text="5" Grid.Column="5" />
+                    <Label Text="6" Grid.Column="6" />
+                    <Label Text="7" Grid.Column="7" />
+                    <Label Text="8" Grid.Column="8" />
+                    <Label Text="9" Grid.Column="9" />
+                    <Label Text="10" Grid.Column="10" />
+                    <Label Text="11" Grid.Column="11" />
+                    <Label Text="12" Grid.Column="12" />
+                    <Label Text="13" Grid.Column="13" />
+                    <Label Text="14" Grid.Column="14" />
+                    <Label Text="15" Grid.Column="15" />
+                    <Label Text="16" Grid.Column="16" />
+                    <Label Text="17" Grid.Column="17" />
+                    <Label Text="18" Grid.Column="18" />
+
+                </Grid>
+
             </StackLayout>
+        </ScrollView>
 
-            <!-- Default Driver Picker -->
-            <StackLayout Orientation="Horizontal" Spacing="8" VerticalOptions="Start">
-                <Label Text="Default Driver:" VerticalOptions="Center"/>
-                <Picker x:Name="defaultDriverPicker"
-                        WidthRequest="180"
-                        VerticalOptions="Center"/>
-            </StackLayout>
-
-            <!-- Table Title Row -->
-            <Label Text="Golf Club Selection"
-                   FontAttributes="Bold"
-                   FontSize="16"
-                   HorizontalOptions="Center"
-                   Margin="0,12,0,0"/>
-
-            <!-- Action Buttons Row: Return (left), Save to PDF (right) -->
-            <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand" Spacing="12" Margin="0,0,0,8">
-                <Button Text="Return"
-                        BackgroundColor="IndianRed"
-                        TextColor="White"
-                        Clicked="OnReturnClicked"
-                        HorizontalOptions="StartAndExpand"/>
-                <Button Text="Save to PDF"
-                        x:Name="savePdfButton"
-                        Clicked="OnSaveToPdfClicked"
-                        BackgroundColor="DarkSeaGreen"
-                        TextColor="White"
-                        HorizontalOptions="End"/>
-            </StackLayout>
-
-            <!-- Single Unified Grid for Table and Change Club Row -->
-            <Grid x:Name="courseGrid"
-                  Margin="0,8,0,0"
-                  ColumnSpacing="4"
-                  RowSpacing="2"
-                  HorizontalOptions="FillAndExpand">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="2*" />
-                </Grid.ColumnDefinitions>
-            </Grid>
-        </StackLayout>
-    </ScrollView>
+    </VerticalStackLayout>
 </ContentPage>

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Maui.Storage;
 
 namespace GolfClubSelectionApp.Services
 {
@@ -10,12 +11,13 @@ namespace GolfClubSelectionApp.Services
     {
         private readonly string _courseFilePath;
         private readonly string _clubFilePath;
+
         private readonly string _exportFolderPath;
         private readonly string _importFolderPath;
         private readonly string _archiveFolderPath;
         private readonly string _backupFolderPath;
 
-        private const string ExportFolderName = "KukiGolf";
+        // Local app data file names
         private const string CourseFileName = "GolfCourseData";
         private const string ClubFileName = "ClubAndDistance";
 
@@ -24,9 +26,9 @@ namespace GolfClubSelectionApp.Services
             _courseFilePath = Path.Combine(FileSystem.AppDataDirectory, CourseFileName + ".txt");
             _clubFilePath = Path.Combine(FileSystem.AppDataDirectory, ClubFileName + ".txt");
 
-            var basePath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                "AppData", ExportFolderName);
+            // Proton Drive base:
+            // C:\Users\<AnyUser>\Proton Drive\ekukulski\My files\Data\GolfClubSelectionApp
+            var basePath = GetProtonDriveBasePath();
 
             _exportFolderPath = Path.Combine(basePath, "Exports");
             _importFolderPath = Path.Combine(basePath, "Imports");
@@ -37,6 +39,27 @@ namespace GolfClubSelectionApp.Services
             Directory.CreateDirectory(_importFolderPath);
             Directory.CreateDirectory(_archiveFolderPath);
             Directory.CreateDirectory(_backupFolderPath);
+        }
+
+        /// <summary>
+        /// Builds the Proton Drive folder path for ANY Windows user:
+        /// C:\Users\<User>\Proton Drive\ekukulski\My files\Data\GolfClubSelectionApp
+        ///
+        /// Folder name "ekukulski" is fixed and must not change.
+        /// </summary>
+        private static string GetProtonDriveBasePath()
+        {
+            // UserProfile => C:\Users\<User>
+            var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+            return Path.Combine(
+                userProfile,
+                "Proton Drive",
+                "ekukulski",          // MUST NOT CHANGE
+                "My files",
+                "Data",
+                "GolfClubSelectionApp"
+            );
         }
 
         public async Task ExportDatabaseAsync()
@@ -52,18 +75,22 @@ namespace GolfClubSelectionApp.Services
 
             string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HHmmss");
             string baseFileName = $"DB_{timestamp}_{fileName}";
+
             string tempFilePath = Path.Combine(_exportFolderPath, $"{baseFileName}.tmp");
             string finalFilePath = Path.Combine(_exportFolderPath, $"{baseFileName}.txt");
             string readyFilePath = Path.Combine(_exportFolderPath, $"{baseFileName}.ready");
             string latestFilePath = Path.Combine(_exportFolderPath, $"LATEST_{fileName}.txt");
 
             await Task.Run(() => File.Copy(localFilePath, tempFilePath, overwrite: true));
+
             await Task.Run(() =>
             {
                 if (File.Exists(finalFilePath))
                     File.Delete(finalFilePath);
+
                 File.Move(tempFilePath, finalFilePath);
             });
+
             await Task.Run(() => File.WriteAllText(readyFilePath, timestamp));
             await Task.Run(() => File.WriteAllText(latestFilePath, $"{baseFileName}.txt"));
         }
@@ -77,6 +104,8 @@ namespace GolfClubSelectionApp.Services
 
         private async Task<bool> ImportFileAsync(string localFilePath, string fileName)
         {
+            // NOTE: Your existing logic imports from _exportFolderPath using LATEST pointers.
+            // Keeping behavior unchanged—just the base path is now Proton Drive.
             string latestPointer = Path.Combine(_exportFolderPath, $"LATEST_{fileName}.txt");
             string? fileToImport = null;
 
@@ -84,6 +113,7 @@ namespace GolfClubSelectionApp.Services
             {
                 string latestFileName = (await Task.Run(() => File.ReadAllText(latestPointer))).Trim();
                 string readyFilePath = Path.Combine(_exportFolderPath, latestFileName.Replace(".txt", ".ready"));
+
                 if (File.Exists(readyFilePath) && File.Exists(Path.Combine(_exportFolderPath, latestFileName)))
                     fileToImport = latestFileName;
             }
@@ -91,12 +121,14 @@ namespace GolfClubSelectionApp.Services
             if (fileToImport == null)
             {
                 var readyFiles = Directory.GetFiles(_exportFolderPath, $"DB_*_{fileName}.ready")
-                    .OrderByDescending(f => f)
-                    .ToList();
+                                          .OrderByDescending(f => f)
+                                          .ToList();
+
                 if (readyFiles.Any())
                 {
                     string readyFile = readyFiles.First();
                     string txtFile = readyFile.Replace(".ready", ".txt");
+
                     if (File.Exists(txtFile))
                         fileToImport = Path.GetFileName(txtFile);
                 }
@@ -110,17 +142,20 @@ namespace GolfClubSelectionApp.Services
             if (!await WaitForFileStabilityAsync(sourceFilePath))
                 return false;
 
+            // Backup existing local file before overwrite
             if (File.Exists(localFilePath))
             {
-                string backupFileName = $"LocalBackup_{DateTime.Now:yyyy-MM-dd_HHmmss}_{fileName}";
+                string backupFileName = $"LocalBackup_{DateTime.Now:yyyy-MM-dd_HHmmss}_{fileName}.txt";
                 string backupFilePath = Path.Combine(_backupFolderPath, backupFileName);
                 await Task.Run(() => File.Copy(localFilePath, backupFilePath, overwrite: true));
             }
 
             string tempImportPath = localFilePath + ".importing.tmp";
             await Task.Run(() => File.Copy(sourceFilePath, tempImportPath, overwrite: true));
+
             if (File.Exists(localFilePath))
                 File.Move(localFilePath, localFilePath + ".old", overwrite: true);
+
             File.Move(tempImportPath, localFilePath, overwrite: true);
 
             return true;
@@ -130,6 +165,7 @@ namespace GolfClubSelectionApp.Services
         {
             int maxRetries = 30;
             int retryCount = 0;
+
             while (retryCount < maxRetries)
             {
                 if (!File.Exists(filePath))
@@ -138,14 +174,18 @@ namespace GolfClubSelectionApp.Services
                     retryCount++;
                     continue;
                 }
+
                 long size1 = new FileInfo(filePath).Length;
                 await Task.Delay(500);
                 long size2 = new FileInfo(filePath).Length;
+
                 if (size1 == size2 && size1 > 0)
                     return true;
+
                 await Task.Delay(2000);
                 retryCount++;
             }
+
             return false;
         }
     }

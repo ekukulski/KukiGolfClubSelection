@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GolfClubSelectionApp.Models;
 using GolfClubSelectionApp.Services;
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Graphics.Text;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -40,9 +41,9 @@ namespace GolfClubSelectionApp
             clubDistancePath = Path.Combine(FileSystem.AppDataDirectory, "ClubAndDistance.txt");
 
             InitializeComponent();
-            
-            // Import from OneDrive before loading data
-            Task.Run(async () => await ImportFromOneDriveAsync()).Wait();
+
+            // Import from Proton Drive (replaces OneDrive)
+            Task.Run(async () => await ImportFromProtonDriveAsync()).Wait();
 
             LoadClubDistances();
             LoadCourses();
@@ -65,7 +66,28 @@ namespace GolfClubSelectionApp
 
             coursePicker.SelectedIndexChanged += OnCourseSelected;
         }
-        
+
+        /// <summary>
+        /// Returns: C:\Users\<AnyUser>\Proton Drive\ekukulski\My files\Documents\Golf
+        /// Works on any Windows PC/user. Folder "ekukulski" is fixed by design.
+        /// </summary>
+        private static string ProtonGolfFolder
+        {
+            get
+            {
+                string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+                return Path.Combine(
+                    userProfile,
+                    "Proton Drive",
+                    "ekukulski",         // MUST NOT CHANGE
+                    "My files",
+                    "Documents",
+                    "Golf"
+                );
+            }
+        }
+
         private void LoadClubDistances()
         {
             clubDistances.Clear();
@@ -376,6 +398,7 @@ namespace GolfClubSelectionApp
                 FontAttributes = FontAttributes.Bold,
                 BackgroundColor = MauiColors.LightGreen
             }, 0, strokesRowIdx);
+
             var strokesTotal = 0;
             for (var i = 0; i < 18; i++)
             {
@@ -397,13 +420,17 @@ namespace GolfClubSelectionApp
             courseGrid.Add(new Label { Text = strokesTotal.ToString(), FontAttributes = FontAttributes.Bold, HorizontalTextAlignment = TextAlignment.Center, BackgroundColor = MauiColors.LightGreen }, 19, strokesRowIdx);
 
             var changeClubRowIdx = rowLabels.Count + 2;
-            courseGrid.Add(new Label
+
+            // "Change Club" label in FloralWhite
+            courseGrid.Add(new Microsoft.Maui.Controls.Label
             {
                 Text = "Change Club",
+                TextColor = MauiColor.FromArgb("#FFFFFAF0"), // FloralWhite
                 FontAttributes = FontAttributes.Bold,
                 HorizontalTextAlignment = TextAlignment.Start,
                 VerticalTextAlignment = TextAlignment.Center,
-                BackgroundColor = MauiColors.Transparent
+                BackgroundColor = MauiColors.Transparent,
+                Style = null // ensures it won't be overridden by implicit Label styles in the Grid
             }, 0, changeClubRowIdx);
 
             for (int i = 0; i < 18; i++)
@@ -530,10 +557,8 @@ namespace GolfClubSelectionApp
                         .OrderByDescending(c => c.MaxDistance)
                         .ToList();
 
-                    // For the second shot, if driver was used, exclude it
                     if (driverUsed)
                     {
-                        // Try to use 3 Wood, 5 Wood, 4 Hybrid, 5 Iron, etc. based on remaining yardage
                         club = availableClubs
                             .FirstOrDefault(c =>
                                 (c.Club.Equals("3 Wood", StringComparison.OrdinalIgnoreCase) ||
@@ -543,7 +568,6 @@ namespace GolfClubSelectionApp
                                 remaining >= c.MaxDistance)
                             .Club;
 
-                        // If none of the above fit, use the best available club for the distance
                         if (string.IsNullOrEmpty(club))
                         {
                             var clubTuple = availableClubs.FirstOrDefault(c => remaining >= c.MaxDistance);
@@ -552,7 +576,6 @@ namespace GolfClubSelectionApp
                     }
                     else
                     {
-                        // If driver was not used, use the best available club for the distance
                         var clubTuple = availableClubs.FirstOrDefault(c => remaining >= c.MaxDistance);
                         club = !string.IsNullOrEmpty(clubTuple.Club) ? clubTuple.Club : (availableClubs.Count > 0 ? availableClubs.Last().Club : "Unknown");
                     }
@@ -612,16 +635,19 @@ namespace GolfClubSelectionApp
         public void SaveDisplayToPdf()
         {
             string courseName = courseNameLabel.Text ?? "Course";
-            string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            string golfFolder = Path.Combine(documentsPath, "Golf");
+
+            // ✅ NEW: Save to Proton Drive Golf folder for ANY Windows user
+            string golfFolder = ProtonGolfFolder;
             Directory.CreateDirectory(golfFolder);
+
+            // Optional: keep same file name, or add timestamp to avoid overwriting
             string filePath = Path.Combine(golfFolder, "GolfClubPlan.pdf");
+
             var tableRows = GetShotTableData();
 
             var lightBlue = PdfColors.Blue.Lighten3;
             var yellow = PdfColors.Yellow.Lighten3;
             var amber = PdfColors.Orange.Lighten2;
-            var green = PdfColors.Green.Lighten2;
             var lightGreen = PdfColors.Green.Lighten4;
             var white = PdfColors.White;
 
@@ -734,22 +760,25 @@ namespace GolfClubSelectionApp
         {
             await Navigation.PopToRootAsync();
         }
+
         private void OnSaveToPdfClicked(object sender, EventArgs e)
         {
             SaveDisplayToPdf();
         }
 
-        // OneDrive sync logic (placeholders, see previous answers for full implementation)
-        private static string OneDriveBase =>
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "OneDrive", "Documents", "AppData", "GolfClubSelectionApp");
-        private static string ExportsFolder => Path.Combine(OneDriveBase, "Exports");
+        // ✅ Proton Drive sync logic (replaces OneDrive references)
+        // If you later implement file copy/sync of ManagedFiles, use these paths.
+        private static string ProtonDriveBase => ProtonGolfFolder;
         private static readonly string[] ManagedFiles = { "ClubAndDistance.txt", "GolfCourseData.txt" };
 
         // Call this after any DB update
-        public async Task ExportToOneDriveAsync() { await _golfDataService.ExportDatabaseAsync(); }
+        public async Task ExportToProtonDriveAsync()
+        {
+            await _golfDataService.ExportDatabaseAsync();
+        }
 
         // Call this on startup
-        public async Task ImportFromOneDriveAsync()
+        public async Task ImportFromProtonDriveAsync()
         {
             MainThread.InvokeOnMainThreadAsync(async () => await _golfDataService.ImportDatabaseAsync());
         }

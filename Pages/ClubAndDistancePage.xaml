@@ -1,33 +1,64 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GolfClubSelectionApp.ClubAndDistancePage"
-             Title="Edit Clubs and Distances">
-    
+             BackgroundColor="Black">
+
     <VerticalStackLayout Padding="20" Spacing="10">
-        <CollectionView x:Name="clubListView" 
+
+        <!-- Page Title -->
+        <Label Text="Edit Clubs and Distances"
+               HorizontalOptions="Center"
+               FontAttributes="Bold"
+               FontSize="24"
+               TextColor="FloralWhite"
+               Margin="0,0,0,10"/>
+
+        <!-- Scoped styles for Entries in this page -->
+        <VerticalStackLayout.Resources>
+
+            <!-- Entry styling: dark background + FloralWhite text -->
+            <Style TargetType="Entry">
+                <Setter Property="TextColor" Value="FloralWhite" />
+                <Setter Property="PlaceholderColor" Value="FloralWhite" />
+                <Setter Property="BackgroundColor" Value="#1E1E1E" />
+                <!-- dark charcoal -->
+                <Setter Property="HeightRequest" Value="40" />
+                <Setter Property="Margin" Value="0,2" />
+            </Style>
+
+        </VerticalStackLayout.Resources>
+
+        <!-- Club / Distance List -->
+        <CollectionView x:Name="clubListView"
                         ItemsSource="{Binding ClubDistances}">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <HorizontalStackLayout Spacing="10">
-                        <Entry Text="{Binding Club}" 
-                               WidthRequest="120"/>
-                        <Entry Text="{Binding MaxDistance}" 
-                               WidthRequest="60" 
-                               Keyboard="Numeric"/>
+
+                        <Entry Text="{Binding Club}"
+                               WidthRequest="120" />
+
+                        <Entry Text="{Binding MaxDistance}"
+                               WidthRequest="60"
+                               Keyboard="Numeric" />
+
                     </HorizontalStackLayout>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
-        
-        <Button Text="Save Changes" 
-                Clicked="OnSaveClicked" 
+
+        <!-- Action Buttons -->
+        <Button Text="Save Changes"
+                Clicked="OnSaveClicked"
                 FontSize="24"
-                BackgroundColor="DarkSeaGreen" 
-                TextColor="White"/>
+                BackgroundColor="DarkSeaGreen"
+                TextColor="FloralWhite"/>
+
         <Button Text="Return"
                 Clicked="OnReturnClicked"
                 FontSize="24"
                 BackgroundColor="IndianRed"
-                TextColor="White"/>
+                TextColor="FloralWhite"/>
+
     </VerticalStackLayout>
 </ContentPage>
