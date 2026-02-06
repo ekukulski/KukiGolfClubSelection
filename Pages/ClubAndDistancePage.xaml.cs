@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.IO;
 using GolfClubSelectionApp.Services;
 
@@ -13,7 +13,7 @@ namespace GolfClubSelectionApp
         public ClubAndDistancePage()
         {
             InitializeComponent();
-            
+
             // Use FileSystem.AppDataDirectory for cross-platform compatibility
             // On Windows, this maps to LocalState: C:\Users\[Username]\AppData\Local\Packages\[PackageId]\LocalState
             clubDistancePath = Path.Combine(FileSystem.AppDataDirectory, "ClubAndDistance.txt");
@@ -44,53 +44,28 @@ namespace GolfClubSelectionApp
             try
             {
                 var lines = ClubDistances.Select(cd => $"{cd.Club},{cd.MaxDistance}");
-                
+
                 // Ensure directory exists (FileSystem.AppDataDirectory is created by MAUI, but being defensive)
                 Directory.CreateDirectory(FileSystem.AppDataDirectory);
-                
+
                 File.WriteAllLines(clubDistancePath, lines);
-                DisplayAlert("Saved", "Club and distance data updated.", "OK");
+
+                // ✅ FIX: DisplayAlert is async, so await it
+                await DisplayAlert("Saved", "Club and distance data updated.", "OK");
+
+                // ✅ Keep this awaited (already correct)
+                await _golfDataService.ExportDatabaseAsync();
             }
             catch (Exception ex)
             {
-                DisplayAlert("Error", $"Failed to save club data: {ex.Message}", "OK");
+                // ✅ FIX: DisplayAlert is async, so await it
+                await DisplayAlert("Error", $"Failed to save club data: {ex.Message}", "OK");
             }
-
-            await _golfDataService.ExportDatabaseAsync();
         }
-        
+
         private async void OnReturnClicked(object sender, EventArgs e)
         {
             await Navigation.PopToRootAsync();
-        }
-        
-        private async Task ExportToOneDriveAsync()
-        {
-            // Implementation for exporting data to OneDrive
-            try
-            {
-                var fileName = "ClubAndDistanceBackup.txt";
-                var filePath = Path.Combine(FileSystem.AppDataDirectory, fileName);
-
-                // Create or overwrite the file with the current club distances
-                using (var streamWriter = new StreamWriter(filePath))
-                {
-                    foreach (var clubDistance in ClubDistances)
-                    {
-                        await streamWriter.WriteLineAsync($"{clubDistance.Club},{clubDistance.MaxDistance}");
-                    }
-                }
-
-                // Now, use the OneDrive SDK or API to upload 'filePath' to the user's OneDrive
-                // This part requires proper authentication and initialization of OneDrive client
-                await _golfDataService.ExportDatabaseAsync();
-
-                await DisplayAlert("Export", "Data exported to OneDrive successfully.", "OK");
-            }
-            catch (Exception ex)
-            {
-                await DisplayAlert("Error", $"Failed to export data: {ex.Message}", "OK");
-            }
         }
     }
 

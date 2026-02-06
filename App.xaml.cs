@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Maui;
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Controls.PlatformConfiguration;
 
 #if WINDOWS
 using Microsoft.Maui.Storage;
@@ -30,7 +31,9 @@ namespace GolfClubSelectionApp
 
         protected override Window CreateWindow(IActivationState? activationState)
         {
-            var window = new Window(MainPage);
+            // MainPage is Page? in MAUI, so guard it to avoid CS8604
+            var page = MainPage ?? new NavigationPage(new HomePage());
+            var window = new Window(page);
 
 #if WINDOWS
             window.HandlerChanged += (s, e) =>
@@ -70,6 +73,7 @@ namespace GolfClubSelectionApp
                     var state = (op.State == OverlappedPresenterState.Maximized) ? "Maximized" : "Normal";
                     Preferences.Default.Set(WindowStateKey, state);
 
+                    // Only persist bounds when in normal state
                     if (state != "Normal")
                         return;
 

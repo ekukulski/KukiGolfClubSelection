@@ -1,9 +1,10 @@
-using Microsoft.Maui.Controls;
+﻿using Microsoft.Maui.Controls;
 using System;
 using System.IO;
 using System.Linq;
 using GolfClubSelectionApp.Services;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace GolfClubSelectionApp
 {
@@ -15,11 +16,14 @@ namespace GolfClubSelectionApp
         public AddNewGolfCourse()
         {
             InitializeComponent();
-            
+
             // Use FileSystem.AppDataDirectory for cross-platform compatibility
             // On Windows, this maps to LocalState: C:\Users\[Username]\AppData\Local\Packages\[PackageId]\LocalState
             filePath = Path.Combine(FileSystem.AppDataDirectory, "GolfCourseData.txt");
         }
+
+        // ✅ FIX: your FindByName is non-generic; cast to Entry safely
+        private Entry? FindEntry(string name) => FindByName(name) as Entry;
 
         /// <summary>
         /// Handles the Save button click. Validates input and saves the course data.
@@ -28,12 +32,12 @@ namespace GolfClubSelectionApp
         {
             try
             {
-                string name = CourseNameEntry.Text?.Trim();
-                string tee = TeeEntry.Text?.Trim();
-                string yardage = YardageEntry.Text?.Trim();
-                string par = CourseParEntry.Text?.Trim();
-                string rating = CourseRatingEntry.Text?.Trim();
-                string slope = CourseSlopeRatingEntry.Text?.Trim();
+                string? name = CourseNameEntry.Text?.Trim();
+                string? tee = TeeEntry.Text?.Trim();
+                string? yardage = YardageEntry.Text?.Trim();
+                string? par = CourseParEntry.Text?.Trim();
+                string? rating = CourseRatingEntry.Text?.Trim();
+                string? slope = CourseSlopeRatingEntry.Text?.Trim();
 
                 if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(tee))
                 {
@@ -41,23 +45,29 @@ namespace GolfClubSelectionApp
                     return;
                 }
 
-                int holeCount = 18;
+                // Optional: ensure these aren't null in the output line
+                yardage ??= "";
+                par ??= "";
+                rating ??= "";
+                slope ??= "";
+
+                const int holeCount = 18;
 
                 var handicapEntries = Enumerable.Range(1, holeCount)
-                    .Select(i => (this.FindByName<Entry>($"HoleHandicap{i}")?.Text ?? "").Trim())
+                    .Select(i => (FindEntry($"HoleHandicap{i}")?.Text ?? "").Trim())
                     .ToList();
 
                 var parEntries = Enumerable.Range(1, holeCount)
-                    .Select(i => (this.FindByName<Entry>($"HolePar{i}")?.Text ?? "").Trim())
+                    .Select(i => (FindEntry($"HolePar{i}")?.Text ?? "").Trim())
                     .ToList();
 
                 var yardageEntries = Enumerable.Range(1, holeCount)
-                    .Select(i => (this.FindByName<Entry>($"HoleYardage{i}")?.Text ?? "").Trim())
+                    .Select(i => (FindEntry($"HoleYardage{i}")?.Text ?? "").Trim())
                     .ToList();
 
-                if (handicapEntries.Any(s => string.IsNullOrWhiteSpace(s)) ||
-                    parEntries.Any(s => string.IsNullOrWhiteSpace(s)) ||
-                    yardageEntries.Any(s => string.IsNullOrWhiteSpace(s)))
+                if (handicapEntries.Any(string.IsNullOrWhiteSpace) ||
+                    parEntries.Any(string.IsNullOrWhiteSpace) ||
+                    yardageEntries.Any(string.IsNullOrWhiteSpace))
                 {
                     await DisplayAlert("Error", $"Please fill in all {holeCount} Hole Handicaps, Pars, and Yardages.", "OK");
                     return;
@@ -69,9 +79,7 @@ namespace GolfClubSelectionApp
                     .Concat(parEntries)
                     .Concat(yardageEntries));
 
-                // Ensure directory exists (FileSystem.AppDataDirectory is created by MAUI, but being defensive)
                 Directory.CreateDirectory(FileSystem.AppDataDirectory);
-
                 File.AppendAllText(filePath, line + Environment.NewLine);
 
                 await DisplayAlert("Success", "Course saved successfully.", "OK");
@@ -83,7 +91,7 @@ namespace GolfClubSelectionApp
                 await DisplayAlert("Error", $"Failed to save course: {ex.Message}", "OK");
             }
         }
-        
+
         /// <summary>
         /// Clears all form fields after saving or reset.
         /// </summary>
@@ -98,9 +106,9 @@ namespace GolfClubSelectionApp
 
             for (int i = 1; i <= 18; i++)
             {
-                var handicapEntry = this.FindByName<Entry>($"HoleHandicap{i}");
-                var parEntry = this.FindByName<Entry>($"HolePar{i}");
-                var yardageEntry = this.FindByName<Entry>($"HoleYardage{i}");
+                var handicapEntry = FindEntry($"HoleHandicap{i}");
+                var parEntry = FindEntry($"HolePar{i}");
+                var yardageEntry = FindEntry($"HoleYardage{i}");
 
                 if (handicapEntry != null) handicapEntry.Text = string.Empty;
                 if (parEntry != null) parEntry.Text = string.Empty;
@@ -108,22 +116,15 @@ namespace GolfClubSelectionApp
             }
         }
 
-        /// <summary>
-        /// Handles the Return button click. Navigates back to the previous page.
-        /// </summary>
         private async void OnReturnClicked(object sender, EventArgs e)
         {
             await Navigation.PopToRootAsync();
         }
 
-        /// <summary>
-        /// Exports the saved golf course data to OneDrive as a CSV file.
-        /// </summary>
         private async Task ExportToOneDriveAsync()
         {
             try
             {
-                // Define the CSV file type for the file picker
                 var csvFileType = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
                 {
                     { DevicePlatform.WinUI, new[] { ".csv" } },
@@ -132,7 +133,6 @@ namespace GolfClubSelectionApp
                     { DevicePlatform.Android, new[] { "text/csv" } }
                 });
 
-                // Let the user choose where to save the file in their OneDrive
                 var fileResult = await FilePicker.PickAsync(new PickOptions
                 {
                     PickerTitle = "Select or Create a CSV file",
@@ -141,9 +141,8 @@ namespace GolfClubSelectionApp
 
                 if (fileResult != null)
                 {
-                    // Read the existing file (if any) and append the new data
                     string csvContent = string.Join(Environment.NewLine, File.ReadAllLines(filePath)
-                        .Select(line => line + "," + string.Join(",", Enumerable.Repeat("", 18)))); // Adding empty columns for new holes
+                        .Select(line => line + "," + string.Join(",", Enumerable.Repeat("", 18))));
 
                     using (var stream = await fileResult.OpenReadAsync())
                     using (var writer = new StreamWriter(stream))

@@ -1,5 +1,4 @@
 using Microsoft.Maui.Controls;
-using GolfClubSelectionApp.Services;
 
 namespace GolfClubSelectionApp
 {
@@ -14,10 +13,12 @@ namespace GolfClubSelectionApp
         {
             await Navigation.PushAsync(new AddNewGolfCourse());
         }
+
         private async void OnClubAndDistanceClicked(object sender, EventArgs e)
         {
             await Navigation.PushAsync(new ClubAndDistancePage());
         }
+
         private async void OnClubSelectionClicked(object sender, EventArgs e)
         {
             await Navigation.PushAsync(new MainPage());
@@ -25,10 +26,8 @@ namespace GolfClubSelectionApp
 
         private void OnExitClicked(object sender, EventArgs e)
         {
-#if ANDROID
-            Android.OS.Process.KillProcess(Android.OS.Process.MyPid());
-#elif WINDOWS
-            Application.Current.Quit();
+#if WINDOWS
+            Application.Current?.Quit();
 #endif
         }
     }
