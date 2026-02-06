@@ -5,7 +5,6 @@
              BackgroundColor="Black">
 
     <ContentPage.Resources>
-        <!-- Style for all table labels to have black text -->
         <Style x:Key="TableLabelStyle" TargetType="Label">
             <Setter Property="TextColor" Value="Black" />
         </Style>
@@ -23,80 +22,80 @@
                FontAttributes="Bold"
                FontSize="24"
                TextColor="FloralWhite"
-               Margin="0,0,0,10"/>
+               Margin="0,0,0,10" />
 
-        <!-- Put the form + table inside a ScrollView that is CONSTRAINED by Grid.Row="1" (Height="*"),
-             so it will actually scroll on smaller monitors. -->
+        <!-- No Expand needed: it will fill because the row is "*" -->
         <ScrollView Grid.Row="1"
-                    VerticalOptions="FillAndExpand">
-            <StackLayout Padding="20" Spacing="12">
+                    VerticalOptions="Fill">
 
-                <!-- Course Picker -->
+            <VerticalStackLayout Padding="20" Spacing="12">
+
                 <Picker x:Name="coursePicker"
                         TextColor="FloralWhite"
                         Title="Select Course" />
 
-                <!-- Course Info Panel -->
-                <StackLayout x:Name="courseInfoPanel"
-                             IsVisible="False"
-                             Spacing="4">
+                <VerticalStackLayout x:Name="courseInfoPanel"
+                                     IsVisible="False"
+                                     Spacing="4">
                     <Label x:Name="courseNameLabel"
                            FontAttributes="Bold"
                            FontSize="18"
-                           TextColor="FloralWhite"/>
+                           TextColor="FloralWhite" />
                     <Label x:Name="courseDetailsLabel"
                            FontSize="14"
-                           TextColor="FloralWhite"/>
-                </StackLayout>
+                           TextColor="FloralWhite" />
+                </VerticalStackLayout>
 
-                <!-- Default Driver Picker -->
-                <StackLayout Orientation="Horizontal"
-                             Spacing="8"
-                             VerticalOptions="Start">
+                <HorizontalStackLayout Spacing="8"
+                                       VerticalOptions="Start">
                     <Label Text="Default Driver:"
                            VerticalOptions="Center"
-                           TextColor="FloralWhite"/>
+                           TextColor="FloralWhite" />
                     <Picker x:Name="defaultDriverPicker"
                             TextColor="FloralWhite"
                             WidthRequest="180"
-                            VerticalOptions="Center"/>
-                </StackLayout>
+                            VerticalOptions="Center" />
+                </HorizontalStackLayout>
 
-                <!-- Table Title Row -->
                 <Label Text="Golf Club Selection"
                        FontAttributes="Bold"
                        FontSize="16"
                        HorizontalOptions="Center"
                        TextColor="FloralWhite"
-                       Margin="0,12,0,0"/>
+                       Margin="0,12,0,0" />
 
-                <!-- Action Buttons Row -->
-                <StackLayout Orientation="Horizontal"
-                             HorizontalOptions="FillAndExpand"
-                             Spacing="12"
-                             Margin="0,0,0,8">
+                <!-- Replace FillAndExpand with a Grid -->
+                <Grid ColumnSpacing="12"
+                      Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
                     <Button Text="Return"
                             BackgroundColor="IndianRed"
                             TextColor="Black"
                             Clicked="OnReturnClicked"
-                            HorizontalOptions="StartAndExpand"/>
+                            Grid.Column="0"
+                            HorizontalOptions="Start" />
+
                     <Button Text="Save to PDF"
                             x:Name="savePdfButton"
                             Clicked="OnSaveToPdfClicked"
                             BackgroundColor="DarkSeaGreen"
                             TextColor="Black"
-                            HorizontalOptions="End"/>
-                </StackLayout>
+                            Grid.Column="1"
+                            HorizontalOptions="End" />
+                </Grid>
 
-                <!-- Single Unified Grid for Table -->
+                <!-- Table Grid: Expand not needed; Fill is fine or omit entirely -->
                 <Grid x:Name="courseGrid"
-      Margin="0,8,0,0"
-      ColumnSpacing="4"
-      RowSpacing="2"
-      HorizontalOptions="FillAndExpand">
+                      Margin="0,8,0,0"
+                      ColumnSpacing="4"
+                      RowSpacing="2"
+                      HorizontalOptions="Fill">
 
                     <Grid.Resources>
-                        <!-- Implicit style: applies to ALL Labels inside this Grid -->
                         <Style TargetType="Label">
                             <Setter Property="TextColor" Value="Black" />
                         </Style>
@@ -125,7 +124,6 @@
                         <ColumnDefinition Width="2*" />
                     </Grid.ColumnDefinitions>
 
-                    <!-- Header Row -->
                     <Label Text="Hole" Grid.Column="0" />
                     <Label Text="1" Grid.Column="1" />
                     <Label Text="2" Grid.Column="2" />
@@ -148,7 +146,7 @@
 
                 </Grid>
 
-            </StackLayout>
+            </VerticalStackLayout>
         </ScrollView>
 
     </Grid>

@@ -131,12 +131,12 @@ namespace GolfClubSelectionApp
                     Par = int.TryParse(parts[3], out var p) ? p : 0,
                     CourseRating = double.TryParse(parts[4], out var cr) ? cr : 0,
                     SlopeRating = int.TryParse(parts[5], out var sr) ? sr : 0,
-                    Handicaps = parts.Skip(6).Take(18).Select(s => int.TryParse(s, out var v) ? v : 0).ToList(),
-                    HolePars = parts.Skip(24).Take(18).Select(s => int.TryParse(s, out var v) ? v : 0).ToList(),
-                    HoleYardages = parts.Skip(42).Take(18).Select(s => int.TryParse(s, out var v) ? v : 0).ToList()
+                    Handicaps = parts.Skip(6).Take(18).Select(s => int.TryParse(s, out var v) ? v : 0).ToArray(),
+                    HolePars = parts.Skip(24).Take(18).Select(s => int.TryParse(s, out var v) ? v : 0).ToArray(),
+                    HoleYardages = parts.Skip(42).Take(18).Select(s => int.TryParse(s, out var v) ? v : 0).ToArray()
                 };
 
-                if (course.Handicaps.Count == 18 && course.HolePars.Count == 18 && course.HoleYardages.Count == 18)
+                if (course.Handicaps.Length == 18 && course.HolePars.Length == 18 && course.HoleYardages.Length == 18)
                     courses[course.Name] = course;
             }
 
@@ -145,7 +145,7 @@ namespace GolfClubSelectionApp
             coursePicker.ItemsSource = sortedCourseNames;
         }
 
-        private void OnDefaultDriverChanged(object sender, EventArgs e)
+        private void OnDefaultDriverChanged(object? sender, EventArgs e)
         {
             if (defaultDriverPicker.SelectedIndex >= 0 && clubDistances.Count > 0)
             {
@@ -211,10 +211,10 @@ namespace GolfClubSelectionApp
             }
         }
 
-        private void OnCourseSelected(object sender, EventArgs e) =>
+        private void OnCourseSelected(object? sender, EventArgs e) =>
             OnCourseSelected(sender, e, null, changeClubSelections.ToArray(), null, yellowHighlightColumns, -1);
 
-        private void OnCourseSelected(object sender, EventArgs e, bool[] highlightStrokes, string[] changeClubOverride, MauiColor? highlightColor, bool[] yellowHighlightColumns, int greenColumnIndex)
+        private void OnCourseSelected(object? sender, EventArgs e, bool[] highlightStrokes, string[] changeClubOverride, MauiColor? highlightColor, bool[] yellowHighlightColumns, int greenColumnIndex)
         {
             if (coursePicker.SelectedItem == null) return;
 
@@ -223,7 +223,7 @@ namespace GolfClubSelectionApp
 
             var course = courses[selectedCourse];
 
-            if (course.Handicaps.Count != 18 || course.HolePars.Count != 18 || course.HoleYardages.Count != 18)
+            if (course.Handicaps.Length != 18 || course.HolePars.Length != 18 || course.HoleYardages.Length != 18)
             {
                 DisplayAlert("Data Error", "Course data is incomplete or corrupt.", "OK");
                 return;
@@ -491,7 +491,7 @@ namespace GolfClubSelectionApp
             return sortedClubs.Last().Club;
         }
 
-        private List<string> CalculateStrokesForHole(int yardage, string overrideClub = null)
+        private List<string> CalculateStrokesForHole(int yardage, string? overrideClub = null)
         {
             var result = new List<string>();
             var remaining = yardage;
@@ -529,15 +529,16 @@ namespace GolfClubSelectionApp
                         dashMode = true;
                     }
                 }
-                else if (strokes == 0 && !string.IsNullOrEmpty(overrideClub))
+                // ✅ change: WhiteSpace check + null-forgiving operator on assignment
+                else if (strokes == 0 && !string.IsNullOrWhiteSpace(overrideClub))
                 {
-                    club = overrideClub;
+                    club = overrideClub!;
                 }
                 else if (strokes == 0)
                 {
                     // Always use the selected default driver for the first shot if the hole is long enough
                     var defaultDriver = clubDistances.FirstOrDefault(c => c.Club == selectedDefaultDriver);
-                    if (defaultDriver.Club != null && remaining >= defaultDriver.MaxDistance)
+                    if (!string.IsNullOrEmpty(defaultDriver.Club) && remaining >= defaultDriver.MaxDistance)
                     {
                         club = defaultDriver.Club;
                         if (club.Equals("Drive", StringComparison.OrdinalIgnoreCase))
@@ -559,25 +560,30 @@ namespace GolfClubSelectionApp
 
                     if (driverUsed)
                     {
-                        club = availableClubs
+                        var preferred = availableClubs
                             .FirstOrDefault(c =>
                                 (c.Club.Equals("3 Wood", StringComparison.OrdinalIgnoreCase) ||
                                  c.Club.Equals("5 Wood", StringComparison.OrdinalIgnoreCase) ||
                                  c.Club.Equals("4 Hybrid", StringComparison.OrdinalIgnoreCase) ||
                                  c.Club.Equals("5 Iron", StringComparison.OrdinalIgnoreCase)) &&
-                                remaining >= c.MaxDistance)
-                            .Club;
+                                remaining >= c.MaxDistance);
+
+                        club = preferred.Club ?? "";
 
                         if (string.IsNullOrEmpty(club))
                         {
                             var clubTuple = availableClubs.FirstOrDefault(c => remaining >= c.MaxDistance);
-                            club = !string.IsNullOrEmpty(clubTuple.Club) ? clubTuple.Club : (availableClubs.Count > 0 ? availableClubs.Last().Club : "Unknown");
+                            club = !string.IsNullOrEmpty(clubTuple.Club)
+                                ? clubTuple.Club
+                                : (availableClubs.Count > 0 ? availableClubs.Last().Club : "Unknown");
                         }
                     }
                     else
                     {
                         var clubTuple = availableClubs.FirstOrDefault(c => remaining >= c.MaxDistance);
-                        club = !string.IsNullOrEmpty(clubTuple.Club) ? clubTuple.Club : (availableClubs.Count > 0 ? availableClubs.Last().Club : "Unknown");
+                        club = !string.IsNullOrEmpty(clubTuple.Club)
+                            ? clubTuple.Club
+                            : (availableClubs.Count > 0 ? availableClubs.Last().Club : "Unknown");
                     }
                 }
 
@@ -630,6 +636,7 @@ namespace GolfClubSelectionApp
 
             return result;
         }
+
 
         // PDF Export using QuestPDF
         public void SaveDisplayToPdf()

@@ -96,7 +96,7 @@ namespace GolfClubSelectionApp
 
     public class ClubDistance
     {
-        public string Club { get; set; }
+        public string? Club { get; set; }
         public int MaxDistance { get; set; }
     }
 }
