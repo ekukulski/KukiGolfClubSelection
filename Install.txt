@@ -1,14 +1,16 @@
-================================================================================
-Golf Club Selection App - Installation Instructions
-Version 1.0.0
+﻿================================================================================
+Golf Club Selection App - Installation & Setup Instructions
+Version 1.0.0 | .NET MAUI Windows Application
 ================================================================================
 
 SYSTEM REQUIREMENTS:
 --------------------
-- Windows 10 version 1809 (build 17763) or later
-- Windows 11 (any version)
+- Windows 10 version 1809 (build 17763) or later, OR Windows 11
 - x64 (64-bit) processor
-- .NET 9.0 Runtime (included in package)
+- .NET 8.0 Runtime (included in installation package)
+- Proton Drive Desktop Client (REQUIRED for data synchronization)
+- Minimum 500 MB free disk space
+- Display resolution: 1366x768 or higher recommended
 
 ================================================================================
 INSTALLATION METHODS
@@ -16,136 +18,338 @@ INSTALLATION METHODS
 
 METHOD 1: AUTOMATED INSTALLATION (RECOMMENDED)
 -----------------------------------------------
-This is the easiest method and automatically installs both the certificate 
-and the application.
+This method automatically installs both the certificate and application.
 
-1. Extract the entire contents of the ZIP file to a folder (e.g., Desktop)
+1. Extract the entire ZIP package to a temporary folder (e.g., Desktop)
 
-2. Right-click on "Add-AppDevPackage.ps1" 
+2. Right-click on "Add-AppDevPackage.ps1"
 
 3. Select "Run with PowerShell"
 
-4. If prompted "Do you want to allow this app to make changes?", click "Yes"
+4. If prompted by User Account Control: "Do you want to allow this app to 
+   make changes?", click "Yes"
 
-5. When prompted, press "Y" to install the certificate and app
+5. When prompted in PowerShell, press "Y" to install the certificate and app
 
-6. Wait for installation to complete
+6. Wait for installation to complete (typically 30-60 seconds)
 
 7. The app will appear in your Start Menu as "Golf Club Selection App"
 
 
 METHOD 2: MANUAL INSTALLATION
 ------------------------------
-If the automated method doesn't work, follow these steps:
+Use this method if PowerShell execution is restricted or automated install fails.
 
 STEP 1: Install the Certificate
 --------------------------------
-1. Locate the file "GolfClubSelectionApp_1.0.0.0_x64.cer"
+The certificate is required to trust the application package.
+
+1. Locate "GolfClubSelectionApp_1.0.0.0_x64.cer" in the extracted folder
 
 2. Double-click the .cer file
 
 3. Click "Install Certificate..."
 
-4. Select "Local Machine" and click "Next"
+4. IMPORTANT: Select "Local Machine" (NOT "Current User"), then click "Next"
 
 5. If prompted by User Account Control, click "Yes"
 
 6. Select "Place all certificates in the following store"
 
-7. Click "Browse" and select "Trusted People"
+7. Click "Browse..." and select "Trusted People"
 
 8. Click "Next", then "Finish"
 
-9. You should see "The import was successful"
+9. Verify you see "The import was successful" message
 
 STEP 2: Install the Application
 ---------------------------------
-1. Locate the file "GolfClubSelectionApp_1.0.0.0_x64.msix"
+1. Locate "GolfClubSelectionApp_1.0.0.0_x64.msix" in the extracted folder
 
 2. Double-click the .msix file
 
-3. Click "Install"
+3. Click "Install" in the app installer window
 
 4. Wait for installation to complete
 
-5. The app will appear in your Start Menu as "Golf Club Selection App"
+5. Click "Launch" or find the app in your Start Menu
+
+
+================================================================================
+PROTON DRIVE SETUP (REQUIRED)
+================================================================================
+
+This application uses Proton Drive for data synchronization and backup.
+You MUST have Proton Drive installed and configured before using the app.
+
+INSTALLING PROTON DRIVE:
+------------------------
+1. Download Proton Drive Desktop from: https://proton.me/drive/download
+
+2. Install Proton Drive Desktop on your Windows PC
+
+3. Sign in with your Proton account
+
+4. IMPORTANT: Ensure Proton Drive is syncing to the default location:
+   C:\Users\[YourUsername]\Proton Drive\
+
+5. Wait for initial synchronization to complete
+
+FOLDER STRUCTURE:
+-----------------
+The app will automatically create and use the following folder structure
+within your Proton Drive:
+
+C:\Users\[YourUsername]\Proton Drive\ekukulski\My files\
+├── Data\
+│   └── GolfClubSelectionApp\
+│       ├── Exports\      (Database exports with timestamps)
+│       ├── Imports\      (Reserved for future use)
+│       └── Archive\      (Archived data files)
+└── Documents\
+    └── Golf\
+        └── GolfClubPlan.pdf (PDF exports saved here)
+
+IMPORTANT NOTES:
+- The folder name "ekukulski" is FIXED and must not be changed
+- All data files automatically sync across devices via Proton Drive
+- PDF exports are saved to the Golf folder for easy access
 
 
 ================================================================================
 FIRST-TIME SETUP
 ================================================================================
 
-After installing the application, you need to set up your club distances and 
-golf courses:
+After installing the application and setting up Proton Drive:
 
-1. Launch "Golf Club Selection App" from the Start Menu
+STEP 1: Launch the Application
+-------------------------------
+1. Press the Windows key
 
-2. On first launch, you'll see "No club data found" message
+2. Type "Golf Club Selection App"
 
-3. Click "Club and Distance" button to set up your clubs:
-   - Enter each club name (e.g., "Driver", "3 Wood", "5 Iron")
-   - Enter the maximum distance for each club in yards
-   - Click "Save" when done
+3. Click to launch (or right-click and "Pin to Start" for quick access)
 
-4. Click "Add New Golf Course" to add courses:
-   - Enter course name, tee, yardage, par, rating, and slope
-   - Enter handicap, par, and yardage for all 18 holes
-   - Click "Save"
+STEP 2: Set Up Your Club Distances
+-----------------------------------
+Before you can select courses, you must configure your club distances.
 
-5. Return to the main page and select a course to begin planning your shots
+1. On the Home Page, click "Club and Distance"
+
+2. For each club you use:
+   - Enter the club name (e.g., "Drive", "3 Wood", "5 Iron", "Pitching Wedge")
+   - Enter the maximum distance YOU can hit that club (in yards)
+   
+   Example entries:
+   Drive, 250
+   3 Wood, 230
+   5 Wood, 210
+   4 Hybrid, 195
+   5 Iron, 180
+   6 Iron, 170
+   7 Iron, 160
+   8 Iron, 150
+   9 Iron, 140
+   Pitching Wedge, 130
+   Gap Wedge, 115
+   Sand Wedge, 100
+   Lob Wedge, 80
+
+3. Click "Save" when all clubs are entered
+
+4. Data automatically syncs to Proton Drive
+
+STEP 3: Add Golf Courses
+-------------------------
+1. From the Home Page, click "Add New Golf Course"
+
+2. Enter course information:
+   - Course Name (e.g., "Pebble Beach")
+   - Tee (e.g., "White", "Blue", "Gold")
+   - Total Yardage
+   - Par
+   - Course Rating (decimal, e.g., 72.5)
+   - Slope Rating (e.g., 130)
+
+3. For each of the 18 holes, enter:
+   - Hole Handicap (1-18, difficulty ranking)
+   - Hole Par (3, 4, or 5)
+   - Hole Yardage
+
+4. Click "Save" when complete
+
+5. Repeat for each course you play
+
+6. Data automatically syncs to Proton Drive
+
+STEP 4: Plan Your Club Selection
+---------------------------------
+1. Return to Home Page
+
+2. Click "Golf Club Selection"
+
+3. Select a course from the dropdown
+
+4. Select your default driver from the "Default Driver" picker
+
+5. The app displays:
+   - Hole-by-hole yardages
+   - Recommended club for each shot
+   - Total strokes per hole
+   - Color-coded grid showing shot progression
+
+6. Optionally override club selection for any hole using the 
+   "Change Club" pickers at the bottom
+
+7. Click "Save to PDF" to export your plan to Proton Drive
 
 
 ================================================================================
-DATA FILE LOCATIONS
+APPLICATION DATA LOCATIONS
 ================================================================================
 
-The application stores data in the following location:
+LOCAL APP DATA:
+---------------
+C:\Users\[YourUsername]\AppData\Local\Packages\
+  com.kukigolf.golfclubselectionapp_[packagehash]\LocalState\
+  ├── GolfCourseData.txt    (Course information)
+  ├── ClubAndDistance.txt   (Your club distances)
+  └── Backups\              (Local backup files)
 
-C:\Users\[YourUsername]\AppData\Local\Packages\com.kukigolf.golfclubselectionapp_[hash]\LocalState\
+PROTON DRIVE SYNC:
+------------------
+C:\Users\[YourUsername]\Proton Drive\ekukulski\My files\
+  ├── Data\GolfClubSelectionApp\
+  │   └── Exports\          (Timestamped database exports)
+  └── Documents\Golf\
+      └── GolfClubPlan.pdf  (Latest PDF export)
 
-Files stored:
-- GolfCourseData.txt (course information)
-- ClubAndDistance.txt (your club distances)
+DATA SYNCHRONIZATION:
+---------------------
+- On app startup: Imports latest data from Proton Drive Exports folder
+- After saving courses/clubs: Exports data to Proton Drive Exports folder
+- After saving PDF: Saves directly to Proton Drive Documents\Golf folder
+- Proton Drive automatically syncs changes across all your devices
 
-PDF exports are saved to:
-C:\Users\[YourUsername]\Documents\Golf\GolfClubPlan.pdf
+
+================================================================================
+FEATURES & USAGE
+================================================================================
+
+COLOR CODING:
+-------------
+- Yellow rows: Hole numbers, Par, Strokes, club selections
+- Amber rows: Handicap, Bogie
+- Light Green rows: Yardage, Strokes summary
+- Light Blue: Selected course name header
+
+STROKE CALCULATION:
+-------------------
+- First shot uses your selected default driver (if hole is long enough)
+- Driver is only used ONCE per hole
+- Subsequent shots select optimal club based on remaining distance
+- Putts are automatically added when reaching the green
+- Maximum 6 strokes calculated per hole
+
+CLUB OVERRIDE:
+--------------
+- Use "Change Club" pickers to override first shot club selection
+- Overrides are highlighted in light green when they change stroke count
+- Yellow highlights show changes from default driver selection
+- Changes update stroke calculations in real-time
+
+PDF EXPORT:
+-----------
+- Creates landscape-oriented PDF showing all 18 holes
+- Includes yardages and club selections for all 6 potential strokes
+- Color-coded for easy reading on course
+- Automatically saved to Proton Drive Documents\Golf folder
+- Syncs to mobile devices for course access
 
 
 ================================================================================
 TROUBLESHOOTING
 ================================================================================
 
-PROBLEM: "Windows protected your PC" message appears
-SOLUTION: Click "More info", then click "Run anyway"
-          This appears because the app uses a self-signed certificate.
+INSTALLATION ISSUES:
+--------------------
+Problem: "Windows protected your PC" blue screen appears
+Solution: Click "More info", then "Run anyway"
+Reason: Self-signed certificate requires this confirmation
 
-PROBLEM: Installation fails with certificate error
-SOLUTION: Ensure you installed the certificate to "Local Machine" > 
-          "Trusted People" store, not "Current User"
+Problem: Installation fails with certificate error
+Solution: Ensure certificate installed to "Local Machine" > "Trusted People"
+          NOT to "Current User" store
 
-PROBLEM: App doesn't appear after installation
-SOLUTION: 1. Press Windows key
-          2. Type "Golf Club Selection App"
-          3. Right-click and select "Pin to Start" for easy access
+Problem: App doesn't appear in Start Menu
+Solution: 1. Press Windows key + type app name
+          2. If found, right-click and "Pin to Start"
+          3. If not found, reinstall using Method 2
 
-PROBLEM: "No club data found" message won't go away
-SOLUTION: You must first enter your club distances using the 
-          "Club and Distance" button on the home page
+PROTON DRIVE ISSUES:
+--------------------
+Problem: "Startup Error" or "No course file found" on launch
+Solution: 1. Verify Proton Drive Desktop is installed and running
+          2. Check Proton Drive is synced to default location
+          3. Ensure you have internet connectivity
+          4. Wait for Proton Drive sync to complete
 
-PROBLEM: Can't find saved courses
-SOLUTION: Ensure you clicked "Save" after entering course data.
-          Check the course picker dropdown on the main page.
+Problem: Data not syncing between devices
+Solution: 1. Verify Proton Drive is running on all devices
+          2. Check internet connectivity
+          3. Manually trigger sync in Proton Drive settings
+          4. Verify folder structure exists in Proton Drive
+
+Problem: PDF not found after export
+Solution: 1. Navigate to C:\Users\[You]\Proton Drive\ekukulski\My files\Documents\Golf\
+          2. Wait for Proton Drive to complete sync (check system tray icon)
+          3. If folder doesn't exist, manually create it
+
+APPLICATION ISSUES:
+-------------------
+Problem: "No club data found" persists after entering clubs
+Solution: 1. Click "Club and Distance" button
+          2. Re-enter at least one club and distance
+          3. Click "Save"
+          4. Return to Home Page and try again
+
+Problem: Course dropdown is empty
+Solution: 1. Click "Add New Golf Course"
+          2. Enter ALL required fields including all 18 holes
+          3. Click "Save"
+          4. Return to Golf Club Selection page
+          5. Check dropdown again
+
+Problem: Wrong club recommendations
+Solution: 1. Verify club distances are accurate for YOUR game
+          2. Update distances in "Club and Distance" page
+          3. Ensure distances are in YARDS (not meters)
+          4. Save changes and reload course
+
+Problem: PDF export fails
+Solution: 1. Ensure Proton Drive folder exists
+          2. Check you have write permissions to the folder
+          3. Close any open PDF viewers
+          4. Try export again
+
+Problem: Window size/position not remembered
+Solution: Windows automatically saves size/position
+          Issue may occur if moving between different monitor setups
+          Simply resize and it will save for that configuration
 
 
 ================================================================================
 UNINSTALLATION
 ================================================================================
 
-To remove the Golf Club Selection App:
+To remove Golf Club Selection App:
 
+STEP 1: Uninstall the Application
+----------------------------------
 1. Open Windows Settings (Windows key + I)
 
-2. Go to "Apps" > "Installed apps"
+2. Navigate to "Apps" > "Installed apps" (Windows 11) 
+   OR "Apps & features" (Windows 10)
 
 3. Search for "Golf Club Selection App"
 
@@ -155,8 +359,32 @@ To remove the Golf Club Selection App:
 
 6. Confirm by clicking "Uninstall" again
 
-Note: Your data files will remain in the AppData folder. To completely 
-remove all data, manually delete the folder mentioned in "DATA FILE LOCATIONS"
+STEP 2: Clean Up Data (Optional)
+---------------------------------
+Your data files remain after uninstall for safety. To completely remove:
+
+Local App Data:
+1. Press Windows key + R
+2. Type: %localappdata%\Packages
+3. Find and delete folder starting with "com.kukigolf.golfclubselectionapp"
+
+Proton Drive Data (keeps data synced across devices):
+- Leave in Proton Drive if you plan to reinstall or use on other devices
+- Delete from Proton Drive only if you want to permanently remove all data
+
+STEP 3: Remove Certificate (Optional)
+--------------------------------------
+Only needed if you won't reinstall:
+
+1. Press Windows key + R, type "certmgr.msc", press Enter
+
+2. Navigate to "Trusted People" > "Certificates"
+
+3. Find certificate for "Golf Club Selection App"
+
+4. Right-click and select "Delete"
+
+5. Confirm deletion
 
 
 ================================================================================
@@ -165,22 +393,196 @@ UPDATING THE APPLICATION
 
 To update to a newer version:
 
-1. Uninstall the current version (see Uninstallation section above)
+IMPORTANT: Your data is preserved during updates!
 
-2. Follow the installation instructions for the new version
+1. Download the new version installation package
 
-3. Your data files will be preserved automatically
+2. Extract to a temporary folder
+
+3. Run "Add-AppDevPackage.ps1" (Method 1) 
+   OR manually install new .msix file (Method 2)
+
+4. The installer will automatically:
+   - Remove the old version
+   - Install the new version
+   - Preserve all your data files
+   - Restore window position and size preferences
+
+5. Launch the updated app
+
+6. Data automatically syncs from Proton Drive
+
+Note: Your local data (ClubAndDistance.txt, GolfCourseData.txt) is NEVER
+deleted during updates. Backups are also maintained in the Backups folder.
 
 
 ================================================================================
-SUPPORT
+MULTI-DEVICE USAGE
 ================================================================================
 
-For questions or issues:
-- Developer: KukiGolf
-- Email: [Your Email Address]
+Using the App on Multiple Computers:
 
-Application Version: 1.0.0
-Last Updated: December 22, 2024
+1. Install Proton Drive Desktop on each computer
+
+2. Sign in with the SAME Proton account on all devices
+
+3. Wait for Proton Drive to complete initial sync
+
+4. Install Golf Club Selection App on each computer
+
+5. On first launch, app will automatically:
+   - Detect existing data in Proton Drive
+   - Import courses and club distances
+   - Be ready to use immediately
+
+Data Sync Behavior:
+- Changes made on any device automatically sync via Proton Drive
+- App checks for updates from Proton Drive on each launch
+- Exports to Proton Drive after every save operation
+- Timestamp-based versioning prevents data loss
+- Local backups maintained on each device
+
+
+================================================================================
+ADVANCED FEATURES
+================================================================================
+
+DATA BACKUP & RESTORE:
+----------------------
+- Automatic backups created in LocalState\Backups\ folder
+- Timestamped exports saved to Proton Drive\ekukulski\My files\Data\GolfClubSelectionApp\Exports\
+- LATEST_* files point to most recent successful export
+- Manual restore: Copy .txt files from Exports to LocalState folder
+
+WINDOW STATE PERSISTENCE:
+-------------------------
+- Window size, position, and maximized state automatically saved
+- Restores to previous state on next launch
+- Per-display configuration (adapts to multi-monitor setups)
+- Minimum window size: 500x400 pixels
+
+DEFAULT DRIVER SELECTION:
+-------------------------
+- Choose your preferred tee shot club (Drive, 3 Wood, etc.)
+- App uses this club for first shot when yardage is appropriate
+- Automatically selects shorter club if hole is too short
+- Can be overridden per-hole using Change Club pickers
+
+
+================================================================================
+DATA FILE FORMATS
+================================================================================
+
+ClubAndDistance.txt:
+--------------------
+Format: ClubName, MaxDistance
+Example:
+Drive, 250
+3 Wood, 230
+5 Iron, 180
+
+GolfCourseData.txt:
+-------------------
+Format (CSV, 60 fields):
+Name, Tee, Yardage, Par, Rating, Slope, 
+[18 Handicaps], [18 Pars], [18 Yardages]
+
+Example:
+Pebble Beach, White, 6737, 72, 73.5, 145, 
+11,3,17,5,1,13,9,7,15,4,10,18,12,8,14,6,16,2,
+4,5,4,4,3,5,3,4,4,4,4,4,3,5,4,3,4,4,
+380,520,390,331,188,516,110,418,464,446,380,202,209,573,397,188,388,543
+
+
+================================================================================
+PRIVACY & SECURITY
+================================================================================
+
+Data Storage:
+- All data stored locally and in YOUR Proton Drive account
+- No data transmitted to external servers (except Proton Drive sync)
+- No analytics or telemetry collected
+- No account creation required for the app itself
+
+Proton Drive Security:
+- End-to-end encryption by Proton
+- Zero-knowledge architecture
+- Data encrypted before leaving your device
+- Only you can decrypt your data
+
+Self-Signed Certificate:
+- Certificate included in package is self-signed
+- Used only for Windows app installation
+- Does not affect data security
+- No internet connection required for certificate validation
+
+
+================================================================================
+KNOWN LIMITATIONS
+================================================================================
+
+- Windows only (no macOS, Linux, iOS, or Android versions at this time)
+- Requires Proton Drive Desktop client for data sync
+- Maximum 6 strokes calculated per hole
+- PDF export is fixed landscape format
+- Course data must be entered manually (no course database import)
+- Club distances in yards only (no metric conversion)
+
+
+================================================================================
+SUPPORT & CONTACT
+================================================================================
+
+For questions, issues, or feedback:
+
+Developer: KukiGolf
+GitHub: https://github.com/ekukulski/GolfClubSelectionApp
+Email: [Your Email Address]
+
+Application Information:
+- Version: 1.0.0
+- .NET Version: .NET 8.0
+- Framework: .NET MAUI
+- License: QuestPDF Community License
+- Last Updated: February 2026
+
+When reporting issues, please include:
+1. Windows version (Settings > System > About)
+2. App version (see above)
+3. Description of the problem
+4. Steps to reproduce the issue
+5. Error messages (if any)
+
+
+================================================================================
+LICENSE & CREDITS
+================================================================================
+
+Golf Club Selection App
+Copyright © 2024-2026 KukiGolf
+
+This application uses the following open-source libraries:
+- .NET MAUI (Microsoft)
+- QuestPDF (MIT License) for PDF generation
+
+Proton Drive is a product of Proton AG.
+This application is not affiliated with or endorsed by Proton AG.
+
+
+================================================================================
+QUICK START SUMMARY
+================================================================================
+
+1. ✓ Install Proton Drive Desktop and sign in
+2. ✓ Run Add-AppDevPackage.ps1 to install app
+3. ✓ Launch Golf Club Selection App from Start Menu
+4. ✓ Click "Club and Distance" - enter your clubs and distances
+5. ✓ Click "Add New Golf Course" - enter course data
+6. ✓ Click "Golf Club Selection" - select course and default driver
+7. ✓ Review shot-by-shot club recommendations
+8. ✓ Click "Save to PDF" to export your plan
+9. ✓ Access PDF in Proton Drive on any device
+
+Enjoy better club selection and lower scores!
 
 ================================================================================
