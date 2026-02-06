@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using GolfClubSelectionApp.Models;
 using GolfClubSelectionApp.Services;
 using Microsoft.Maui.Controls;
-using Microsoft.Maui.Graphics.Text;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -23,13 +22,18 @@ namespace GolfClubSelectionApp
         private readonly Dictionary<string, GolfCourse> courses = new();
 
         private readonly string clubDistancePath;
-        private List<(string Club, int MaxDistance)> clubDistances = new();
+        private readonly List<(string Club, int MaxDistance)> clubDistances = new();
 
-        private string selectedDefaultDriver;
-        private int[] previousStrokesPerHole = null;
-        private string[] changeClubSelections = new string[18];
-        private Picker[] changeClubPickers = new Picker[18];
-        private bool[] yellowHighlightColumns = new bool[18];
+        private string selectedDefaultDriver = string.Empty;
+
+        // Nullable: can legitimately be "not calculated yet"
+        private int[]? previousStrokesPerHole;
+
+        // Nullable per hole: no override selected
+        private readonly string?[] changeClubSelections = new string?[18];
+        private readonly Picker?[] changeClubPickers = new Picker?[18];
+
+        private readonly bool[] yellowHighlightColumns = new bool[18];
 
         private readonly GolfDataService _golfDataService = new();
 
@@ -42,29 +46,31 @@ namespace GolfClubSelectionApp
 
             InitializeComponent();
 
-            // Import from Proton Drive (replaces OneDrive)
-            Task.Run(async () => await ImportFromProtonDriveAsync()).Wait();
+            // Don’t block the UI thread in the constructor. Initialize asynchronously.
+            _ = InitializeAsync();
 
-            LoadClubDistances();
-            LoadCourses();
+            // Safe even if coursePicker is null (but it shouldn’t be after InitializeComponent)
+            if (coursePicker != null)
+                coursePicker.SelectedIndexChanged += OnCourseSelected;
+        }
 
-            // Initialize default driver picker only if we have club data
-            if (defaultDriverPicker != null && clubDistances.Count > 0)
+        private async Task InitializeAsync()
+        {
+            try
             {
-                defaultDriverPicker.ItemsSource = clubDistances.Select(c => c.Club).ToList();
-                defaultDriverPicker.SelectedIndex = 0;
-                selectedDefaultDriver = clubDistances[0].Club;
-                defaultDriverPicker.SelectedIndexChanged += OnDefaultDriverChanged;
-            }
-            else if (defaultDriverPicker != null)
-            {
-                // No club data available - set a message or default empty state
-                defaultDriverPicker.ItemsSource = new List<string> { "No club data found" };
-                defaultDriverPicker.SelectedIndex = 0;
-                defaultDriverPicker.SelectedIndexChanged += OnDefaultDriverChanged;
-            }
+                // Import from Proton Drive (replaces OneDrive)
+                await ImportFromProtonDriveAsync();
 
-            coursePicker.SelectedIndexChanged += OnCourseSelected;
+                LoadClubDistances();
+                LoadCourses();
+
+                InitializeDefaultDriverPicker();
+            }
+            catch (Exception ex)
+            {
+                // Avoid crashing on startup; surface a friendly message.
+                await DisplayAlert("Startup Error", ex.Message, "OK");
+            }
         }
 
         /// <summary>
@@ -88,19 +94,47 @@ namespace GolfClubSelectionApp
             }
         }
 
+        private void InitializeDefaultDriverPicker()
+        {
+            if (defaultDriverPicker == null)
+                return;
+
+            if (clubDistances.Count > 0)
+            {
+                defaultDriverPicker.ItemsSource = clubDistances.Select(c => c.Club).ToList();
+                defaultDriverPicker.SelectedIndex = 0;
+
+                selectedDefaultDriver = defaultDriverPicker.SelectedItem as string ?? clubDistances[0].Club;
+
+                defaultDriverPicker.SelectedIndexChanged -= OnDefaultDriverChanged;
+                defaultDriverPicker.SelectedIndexChanged += OnDefaultDriverChanged;
+            }
+            else
+            {
+                defaultDriverPicker.ItemsSource = new List<string> { "No club data found" };
+                defaultDriverPicker.SelectedIndex = 0;
+
+                selectedDefaultDriver = string.Empty;
+
+                defaultDriverPicker.SelectedIndexChanged -= OnDefaultDriverChanged;
+                defaultDriverPicker.SelectedIndexChanged += OnDefaultDriverChanged;
+            }
+        }
+
         private void LoadClubDistances()
         {
             clubDistances.Clear();
-            if (File.Exists(clubDistancePath))
+
+            if (!File.Exists(clubDistancePath))
+                return;
+
+            var lines = File.ReadAllLines(clubDistancePath);
+            foreach (var line in lines)
             {
-                var lines = File.ReadAllLines(clubDistancePath);
-                foreach (var line in lines)
+                var parts = line.Split(',');
+                if (parts.Length >= 2 && int.TryParse(parts[1].Trim(), out int distance))
                 {
-                    var parts = line.Split(',');
-                    if (parts.Length >= 2 && int.TryParse(parts[1].Trim(), out int distance))
-                    {
-                        clubDistances.Add((parts[0].Trim(), distance));
-                    }
+                    clubDistances.Add((parts[0].Trim(), distance));
                 }
             }
         }
@@ -109,6 +143,9 @@ namespace GolfClubSelectionApp
         {
             courses.Clear();
 
+            if (coursePicker == null)
+                return;
+
             if (!File.Exists(courseDataPath))
             {
                 coursePicker.ItemsSource = new List<string> { "No course file found" };
@@ -116,12 +153,14 @@ namespace GolfClubSelectionApp
             }
 
             var lines = File.ReadAllLines(courseDataPath)
-                .Where(line => !string.IsNullOrWhiteSpace(line)).ToList();
+                .Where(line => !string.IsNullOrWhiteSpace(line))
+                .ToList();
 
             foreach (var line in lines)
             {
                 var parts = line.Split(',');
-                if (parts.Length < 60) continue;
+                if (parts.Length < 60)
+                    continue;
 
                 var course = new GolfCourse
                 {
@@ -147,94 +186,118 @@ namespace GolfClubSelectionApp
 
         private void OnDefaultDriverChanged(object? sender, EventArgs e)
         {
-            if (defaultDriverPicker.SelectedIndex >= 0 && clubDistances.Count > 0)
+            if (defaultDriverPicker == null)
+                return;
+
+            if (defaultDriverPicker.SelectedIndex < 0 || clubDistances.Count == 0)
+                return;
+
+            selectedDefaultDriver = defaultDriverPicker.SelectedItem as string ?? string.Empty;
+
+            for (int i = 0; i < 18; i++)
             {
-                selectedDefaultDriver = defaultDriverPicker.SelectedItem.ToString();
+                changeClubSelections[i] = null;
+                if (changeClubPickers[i] != null)
+                    changeClubPickers[i]!.SelectedIndex = -1;
+            }
+
+            if (coursePicker?.SelectedItem is string selectedCourseName &&
+                courses.TryGetValue(selectedCourseName, out var course))
+            {
+                var newStrokesPerHole = CalculateStrokesPerHoleArray(course, changeClubSelections);
+
+                bool[] highlight = new bool[18];
+                if (previousStrokesPerHole != null)
+                {
+                    for (int i = 0; i < 18; i++)
+                        highlight[i] = previousStrokesPerHole[i] != newStrokesPerHole[i];
+                }
+
+                previousStrokesPerHole = newStrokesPerHole;
 
                 for (int i = 0; i < 18; i++)
-                {
-                    changeClubSelections[i] = null;
-                    if (changeClubPickers[i] != null)
-                        changeClubPickers[i].SelectedIndex = -1;
-                }
+                    yellowHighlightColumns[i] = highlight[i];
 
-                if (coursePicker.SelectedItem != null && courses.TryGetValue(coursePicker.SelectedItem.ToString(), out var course))
-                {
-                    var newStrokesPerHole = CalculateStrokesPerHoleArray(course, changeClubSelections);
-                    bool[] highlight = new bool[18];
-                    if (previousStrokesPerHole != null)
-                    {
-                        for (int i = 0; i < 18; i++)
-                            highlight[i] = previousStrokesPerHole[i] != newStrokesPerHole[i];
-                    }
-                    previousStrokesPerHole = newStrokesPerHole;
-
-                    for (int i = 0; i < 18; i++)
-                        yellowHighlightColumns[i] = highlight[i];
-
-                    OnCourseSelected(this, EventArgs.Empty, highlight, changeClubSelections.ToArray(), MauiColors.Yellow, yellowHighlightColumns, -1);
-                }
-                else
-                {
-                    Array.Clear(yellowHighlightColumns, 0, yellowHighlightColumns.Length);
-                    OnCourseSelected(this, EventArgs.Empty, null, changeClubSelections.ToArray(), null, yellowHighlightColumns, -1);
-                }
+                OnCourseSelected(this, EventArgs.Empty, highlight, changeClubSelections, MauiColors.Yellow, yellowHighlightColumns, -1);
+            }
+            else
+            {
+                Array.Clear(yellowHighlightColumns, 0, yellowHighlightColumns.Length);
+                OnCourseSelected(this, EventArgs.Empty, null, changeClubSelections, null, yellowHighlightColumns, -1);
             }
         }
 
         private void OnChangeClubPickerChanged(object sender, EventArgs e)
         {
-            var picker = sender as Picker;
-            if (picker == null) return;
+            if (sender is not Picker picker)
+                return;
 
             int holeIndex = Array.IndexOf(changeClubPickers, picker);
-            if (holeIndex < 0 || holeIndex >= 18) return;
+            if (holeIndex < 0 || holeIndex >= 18)
+                return;
 
-            string selectedClub = picker.SelectedItem as string;
-            changeClubSelections[holeIndex] = selectedClub;
+            changeClubSelections[holeIndex] = picker.SelectedItem as string;
 
-            if (coursePicker.SelectedItem != null && courses.TryGetValue(coursePicker.SelectedItem.ToString(), out var course))
+            if (coursePicker?.SelectedItem is string courseName &&
+                courses.TryGetValue(courseName, out var course))
             {
                 var newStrokesPerHole = CalculateStrokesPerHoleArray(course, changeClubSelections);
+
                 bool[] highlight = new bool[18];
                 if (previousStrokesPerHole != null)
                 {
                     for (int i = 0; i < 18; i++)
                         highlight[i] = (i == holeIndex) && (previousStrokesPerHole[i] != newStrokesPerHole[i]);
                 }
+
                 previousStrokesPerHole = newStrokesPerHole;
 
                 if (highlight[holeIndex])
                     yellowHighlightColumns[holeIndex] = false;
 
-                OnCourseSelected(this, EventArgs.Empty, highlight, changeClubSelections.ToArray(), MauiColors.LightGreen, yellowHighlightColumns, holeIndex);
+                OnCourseSelected(this, EventArgs.Empty, highlight, changeClubSelections, MauiColors.LightGreen, yellowHighlightColumns, holeIndex);
             }
         }
 
         private void OnCourseSelected(object? sender, EventArgs e) =>
-            OnCourseSelected(sender, e, null, changeClubSelections.ToArray(), null, yellowHighlightColumns, -1);
+            OnCourseSelected(sender, e, null, changeClubSelections, null, yellowHighlightColumns, -1);
 
-        private void OnCourseSelected(object? sender, EventArgs e, bool[] highlightStrokes, string[] changeClubOverride, MauiColor? highlightColor, bool[] yellowHighlightColumns, int greenColumnIndex)
+        private void OnCourseSelected(
+            object? sender,
+            EventArgs e,
+            bool[]? highlightStrokes,
+            string?[] changeClubOverride,
+            MauiColor? highlightColor,
+            bool[] yellowHighlightColumnsLocal,
+            int greenColumnIndex)
         {
-            if (coursePicker.SelectedItem == null) return;
+            if (coursePicker?.SelectedItem is not string selectedCourseName)
+                return;
 
-            var selectedCourse = coursePicker.SelectedItem.ToString();
-            if (!courses.ContainsKey(selectedCourse)) return;
-
-            var course = courses[selectedCourse];
+            if (!courses.TryGetValue(selectedCourseName, out var course))
+                return;
 
             if (course.Handicaps.Length != 18 || course.HolePars.Length != 18 || course.HoleYardages.Length != 18)
             {
-                DisplayAlert("Data Error", "Course data is incomplete or corrupt.", "OK");
+                _ = DisplayAlert("Data Error", "Course data is incomplete or corrupt.", "OK");
                 return;
             }
 
             // Set course name label background color (light blue)
-            courseNameLabel.BackgroundColor = MauiColors.LightBlue;
+            if (courseNameLabel != null)
+                courseNameLabel.BackgroundColor = MauiColors.LightBlue;
 
-            courseInfoPanel.IsVisible = true;
-            courseNameLabel.Text = $"{course.Name} ({course.Tee})";
-            courseDetailsLabel.Text = $"Yardage: {course.Yardage} | Par: {course.Par} | Rating: {course.CourseRating} | Slope: {course.SlopeRating}";
+            if (courseInfoPanel != null)
+                courseInfoPanel.IsVisible = true;
+
+            if (courseNameLabel != null)
+                courseNameLabel.Text = $"{course.Name} ({course.Tee})";
+
+            if (courseDetailsLabel != null)
+                courseDetailsLabel.Text = $"Yardage: {course.Yardage} | Par: {course.Par} | Rating: {course.CourseRating} | Slope: {course.SlopeRating}";
+
+            if (courseGrid == null)
+                return;
 
             courseGrid.Children.Clear();
             courseGrid.ColumnDefinitions.Clear();
@@ -244,7 +307,8 @@ namespace GolfClubSelectionApp
             for (var i = 1; i < 20; i++)
                 courseGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-            var baseLabels = new[] {
+            var baseLabels = new[]
+            {
                 "Hole", "Handicap", "Par", "Bogie",
                 "Yardage 1", "Stroke 1", "Yardage 2", "Stroke 2", "Yardage 3", "Stroke 3",
                 "Yardage 4", "Stroke 4", "Yardage 5", "Stroke 5", "Yardage 6", "Stroke 6"
@@ -254,8 +318,9 @@ namespace GolfClubSelectionApp
             for (var i = 0; i < baseLabels.Length; i++)
             {
                 rowLabels.Add(baseLabels[i]);
+
                 if (baseLabels[i] == "Bogie" ||
-                    (baseLabels[i].StartsWith("Stroke") && baseLabels[i] != "Stroke 6"))
+                    (baseLabels[i].StartsWith("Stroke", StringComparison.Ordinal) && baseLabels[i] != "Stroke 6"))
                 {
                     rowLabels.Add("");
                 }
@@ -263,9 +328,7 @@ namespace GolfClubSelectionApp
 
             var allHoleStrokes = new List<List<string>>();
             for (var h = 0; h < 18; h++)
-            {
-                allHoleStrokes.Add(CalculateStrokesForHole(course.HoleYardages[h], changeClubOverride?[h]));
-            }
+                allHoleStrokes.Add(CalculateStrokesForHole(course.HoleYardages[h], changeClubOverride[h]));
 
             for (var i = 0; i < rowLabels.Count + 3; i++)
                 courseGrid.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
@@ -273,8 +336,10 @@ namespace GolfClubSelectionApp
             // Add "Hole" row with yellow background
             var holeRowColor = MauiColors.Yellow;
             courseGrid.Add(new Label { Text = "Hole", FontAttributes = FontAttributes.Bold, BackgroundColor = holeRowColor }, 0, 0);
+
             for (var i = 1; i <= 18; i++)
                 courseGrid.Add(new Label { Text = i.ToString(), HorizontalTextAlignment = TextAlignment.Center, BackgroundColor = holeRowColor }, i, 0);
+
             courseGrid.Add(new Label { Text = "Total", FontAttributes = FontAttributes.Bold, HorizontalTextAlignment = TextAlignment.Center, BackgroundColor = holeRowColor }, 19, 0);
 
             var dataRow = 0;
@@ -293,14 +358,14 @@ namespace GolfClubSelectionApp
                     rowBg = MauiColor.FromArgb("#FFBF00"); // Amber
                 else if (label == "Par")
                     rowBg = MauiColors.Yellow;
-                else if (label.StartsWith("Yardage"))
+                else if (label.StartsWith("Yardage", StringComparison.Ordinal))
                     rowBg = MauiColors.LightGreen;
-                else if (label.StartsWith("Stroke"))
+                else if (label.StartsWith("Stroke", StringComparison.Ordinal))
                     rowBg = MauiColors.Yellow;
                 else if (label == "Strokes")
                     rowBg = MauiColors.LightGreen;
 
-                // Add the label for the row header
+                // Row header label
                 courseGrid.Add(new Label
                 {
                     Text = label,
@@ -314,6 +379,7 @@ namespace GolfClubSelectionApp
                     {
                         for (var i = 0; i < 18; i++)
                             courseGrid.Add(new Label { Text = course.Handicaps[i].ToString(), HorizontalTextAlignment = TextAlignment.Center, BackgroundColor = rowBg ?? MauiColors.Transparent }, i + 1, row);
+
                         courseGrid.Add(new Label { Text = "", HorizontalTextAlignment = TextAlignment.Center, BackgroundColor = rowBg ?? MauiColors.Transparent }, 19, row);
                     }
                     else if (label == "Par")
@@ -335,21 +401,24 @@ namespace GolfClubSelectionApp
                         }
                         courseGrid.Add(new Label { Text = bogieTotal.ToString(), FontAttributes = FontAttributes.Bold, HorizontalTextAlignment = TextAlignment.Center, BackgroundColor = rowBg ?? MauiColors.Transparent }, 19, row);
                     }
-                    else if (label.StartsWith("Stroke"))
+                    else if (label.StartsWith("Stroke", StringComparison.Ordinal))
                     {
                         var strokeIdx = int.Parse(label.Split(' ')[1]) - 1;
                         var rowTotal = 0;
+
                         for (var i = 0; i < 18; i++)
                         {
                             var club = (dataRow < allHoleStrokes[i].Count) ? allHoleStrokes[i][dataRow] : "";
                             if (club != "-") { rowTotal++; strokesPerHole[i]++; }
+
                             courseGrid.Add(new Label { Text = club, HorizontalTextAlignment = TextAlignment.Center, BackgroundColor = rowBg ?? MauiColors.Transparent }, i + 1, row);
                         }
+
                         strokeRowTotals[strokeIdx] = rowTotal;
                         courseGrid.Add(new Label { Text = rowTotal.ToString(), FontAttributes = FontAttributes.Bold, HorizontalTextAlignment = TextAlignment.Center, BackgroundColor = rowBg ?? MauiColors.Transparent }, 19, row);
                         dataRow++;
                     }
-                    else if (label.StartsWith("Yardage"))
+                    else if (label.StartsWith("Yardage", StringComparison.Ordinal))
                     {
                         for (var i = 0; i < 18; i++)
                         {
@@ -371,13 +440,20 @@ namespace GolfClubSelectionApp
                             };
 
                             if (highlightStrokes != null && highlightStrokes.Length > i && highlightStrokes[i] && highlightColor != null)
-                                labelCtrl.BackgroundColor = (MauiColor)highlightColor;
-                            else if (yellowHighlightColumns != null && yellowHighlightColumns.Length > i && yellowHighlightColumns[i])
+                                labelCtrl.BackgroundColor = highlightColor;
+                            else if (yellowHighlightColumnsLocal.Length > i && yellowHighlightColumnsLocal[i])
                                 labelCtrl.BackgroundColor = MauiColors.Yellow;
 
                             courseGrid.Add(labelCtrl, i + 1, row);
                         }
-                        courseGrid.Add(new Label { Text = strokesPerHole.Sum().ToString(), FontAttributes = FontAttributes.Bold, HorizontalTextAlignment = TextAlignment.Center, BackgroundColor = rowBg ?? MauiColors.Transparent }, 19, row);
+
+                        courseGrid.Add(new Label
+                        {
+                            Text = strokesPerHole.Sum().ToString(),
+                            FontAttributes = FontAttributes.Bold,
+                            HorizontalTextAlignment = TextAlignment.Center,
+                            BackgroundColor = rowBg ?? MauiColors.Transparent
+                        }, 19, row);
                     }
                 }
                 else
@@ -410,19 +486,26 @@ namespace GolfClubSelectionApp
                 };
 
                 if (highlightStrokes != null && highlightStrokes.Length > i && highlightStrokes[i] && highlightColor != null)
-                    labelCtrl.BackgroundColor = (MauiColor)highlightColor;
-                else if (yellowHighlightColumns != null && yellowHighlightColumns.Length > i && yellowHighlightColumns[i])
+                    labelCtrl.BackgroundColor = highlightColor;
+                else if (yellowHighlightColumnsLocal.Length > i && yellowHighlightColumnsLocal[i])
                     labelCtrl.BackgroundColor = MauiColors.Yellow;
 
                 courseGrid.Add(labelCtrl, i + 1, strokesRowIdx);
                 strokesTotal += strokesPerHole[i];
             }
-            courseGrid.Add(new Label { Text = strokesTotal.ToString(), FontAttributes = FontAttributes.Bold, HorizontalTextAlignment = TextAlignment.Center, BackgroundColor = MauiColors.LightGreen }, 19, strokesRowIdx);
+
+            courseGrid.Add(new Label
+            {
+                Text = strokesTotal.ToString(),
+                FontAttributes = FontAttributes.Bold,
+                HorizontalTextAlignment = TextAlignment.Center,
+                BackgroundColor = MauiColors.LightGreen
+            }, 19, strokesRowIdx);
 
             var changeClubRowIdx = rowLabels.Count + 2;
 
             // "Change Club" label in FloralWhite
-            courseGrid.Add(new Microsoft.Maui.Controls.Label
+            courseGrid.Add(new Label
             {
                 Text = "Change Club",
                 TextColor = MauiColor.FromArgb("#FFFFFAF0"), // FloralWhite
@@ -438,48 +521,59 @@ namespace GolfClubSelectionApp
                 var picker = new Picker
                 {
                     ItemsSource = clubDistances.Select(c => c.Club).ToList(),
-                    SelectedIndex = changeClubSelections[i] == null ? -1 : clubDistances.FindIndex(c => c.Club == changeClubSelections[i]),
-                    HorizontalOptions = LayoutOptions.FillAndExpand,
+                    SelectedIndex = changeClubSelections[i] == null
+                        ? -1
+                        : clubDistances.FindIndex(c => c.Club == changeClubSelections[i]),
+                    // ✅ FIX: FillAndExpand is obsolete in MAUI. In a Grid, use Fill (no Expand).
+                    HorizontalOptions = LayoutOptions.Fill,
                     BackgroundColor = MauiColors.Transparent
                 };
+
                 int holeIndex = i;
-                picker.SelectedIndexChanged += (s, e) =>
+                picker.SelectedIndexChanged += (s, _) =>
                 {
-                    changeClubSelections[holeIndex] = picker.SelectedIndex >= 0 ? picker.ItemsSource[picker.SelectedIndex] as string : null;
+                    changeClubSelections[holeIndex] = picker.SelectedIndex >= 0
+                        ? picker.ItemsSource[picker.SelectedIndex] as string
+                        : null;
+
                     OnChangeClubPickerChanged(picker, EventArgs.Empty);
                 };
+
                 changeClubPickers[i] = picker;
                 courseGrid.Add(picker, i + 1, changeClubRowIdx);
             }
+
             courseGrid.Add(new Label { Text = "", BackgroundColor = MauiColors.Transparent }, 19, changeClubRowIdx);
 
             if (highlightStrokes == null)
-            {
                 previousStrokesPerHole = strokesPerHole.ToArray();
-            }
 
             courseGrid.IsVisible = true;
         }
 
-        private int[] CalculateStrokesPerHoleArray(GolfCourse course, string[] changeClubOverride)
+        private int[] CalculateStrokesPerHoleArray(GolfCourse course, string?[] changeClubOverride)
         {
             var strokesPerHole = new int[18];
+
             for (int h = 0; h < 18; h++)
             {
-                var strokes = CalculateStrokesForHole(course.HoleYardages[h], changeClubOverride?[h]);
+                var strokes = CalculateStrokesForHole(course.HoleYardages[h], changeClubOverride[h]);
+
                 int count = 0;
                 for (int i = 2; i < strokes.Count; i += 2)
                 {
                     if (strokes[i] != "-") count++;
                 }
+
                 strokesPerHole[h] = count;
             }
+
             return strokesPerHole;
         }
 
         private string GetClubForDistance(int distance)
         {
-            if (clubDistances == null || clubDistances.Count == 0)
+            if (clubDistances.Count == 0)
                 return "Unknown";
 
             var sortedClubs = clubDistances.OrderByDescending(c => c.MaxDistance).ToList();
@@ -488,6 +582,7 @@ namespace GolfClubSelectionApp
                 if (distance >= club.MaxDistance)
                     return club.Club;
             }
+
             return sortedClubs.Last().Club;
         }
 
@@ -501,7 +596,7 @@ namespace GolfClubSelectionApp
             bool driverUsed = false;
 
             // Defensive: ensure clubDistances is loaded
-            if (clubDistances == null || clubDistances.Count == 0)
+            if (clubDistances.Count == 0)
                 LoadClubDistances();
 
             result.Add(remaining > 0 ? remaining.ToString() : "0");
@@ -510,7 +605,7 @@ namespace GolfClubSelectionApp
             var strokes = 0;
             while (strokes < 6)
             {
-                string club = "";
+                string club;
 
                 if (dashMode)
                 {
@@ -529,7 +624,6 @@ namespace GolfClubSelectionApp
                         dashMode = true;
                     }
                 }
-                // ✅ change: WhiteSpace check + null-forgiving operator on assignment
                 else if (strokes == 0 && !string.IsNullOrWhiteSpace(overrideClub))
                 {
                     club = overrideClub!;
@@ -538,9 +632,11 @@ namespace GolfClubSelectionApp
                 {
                     // Always use the selected default driver for the first shot if the hole is long enough
                     var defaultDriver = clubDistances.FirstOrDefault(c => c.Club == selectedDefaultDriver);
+
                     if (!string.IsNullOrEmpty(defaultDriver.Club) && remaining >= defaultDriver.MaxDistance)
                     {
                         club = defaultDriver.Club;
+
                         if (club.Equals("Drive", StringComparison.OrdinalIgnoreCase))
                             driverUsed = true;
                     }
@@ -558,32 +654,27 @@ namespace GolfClubSelectionApp
                         .OrderByDescending(c => c.MaxDistance)
                         .ToList();
 
-                    if (driverUsed)
+                    if (availableClubs.Count == 0)
                     {
-                        var preferred = availableClubs
-                            .FirstOrDefault(c =>
-                                (c.Club.Equals("3 Wood", StringComparison.OrdinalIgnoreCase) ||
-                                 c.Club.Equals("5 Wood", StringComparison.OrdinalIgnoreCase) ||
-                                 c.Club.Equals("4 Hybrid", StringComparison.OrdinalIgnoreCase) ||
-                                 c.Club.Equals("5 Iron", StringComparison.OrdinalIgnoreCase)) &&
-                                remaining >= c.MaxDistance);
+                        club = "Unknown";
+                    }
+                    else if (driverUsed)
+                    {
+                        var preferred = availableClubs.FirstOrDefault(c =>
+                            (c.Club.Equals("3 Wood", StringComparison.OrdinalIgnoreCase) ||
+                             c.Club.Equals("5 Wood", StringComparison.OrdinalIgnoreCase) ||
+                             c.Club.Equals("4 Hybrid", StringComparison.OrdinalIgnoreCase) ||
+                             c.Club.Equals("5 Iron", StringComparison.OrdinalIgnoreCase)) &&
+                            remaining >= c.MaxDistance);
 
-                        club = preferred.Club ?? "";
-
-                        if (string.IsNullOrEmpty(club))
-                        {
-                            var clubTuple = availableClubs.FirstOrDefault(c => remaining >= c.MaxDistance);
-                            club = !string.IsNullOrEmpty(clubTuple.Club)
-                                ? clubTuple.Club
-                                : (availableClubs.Count > 0 ? availableClubs.Last().Club : "Unknown");
-                        }
+                        club = !string.IsNullOrEmpty(preferred.Club)
+                            ? preferred.Club
+                            : (availableClubs.FirstOrDefault(c => remaining >= c.MaxDistance).Club ?? availableClubs.Last().Club);
                     }
                     else
                     {
                         var clubTuple = availableClubs.FirstOrDefault(c => remaining >= c.MaxDistance);
-                        club = !string.IsNullOrEmpty(clubTuple.Club)
-                            ? clubTuple.Club
-                            : (availableClubs.Count > 0 ? availableClubs.Last().Club : "Unknown");
+                        club = !string.IsNullOrEmpty(clubTuple.Club) ? clubTuple.Club : availableClubs.Last().Club;
                     }
                 }
 
@@ -604,6 +695,7 @@ namespace GolfClubSelectionApp
                 {
                     var clubTuple = clubDistances.FirstOrDefault(c => c.Club == club);
                     var clubDist = !string.IsNullOrEmpty(clubTuple.Club) ? clubTuple.MaxDistance : 0;
+
                     remaining -= clubDist;
                     nextYardage = remaining > 0 ? remaining.ToString() : "0";
                 }
@@ -617,37 +709,33 @@ namespace GolfClubSelectionApp
                         nextYardage = "-";
                     }
                 }
+
                 result.Add(nextYardage);
 
                 if (dashMode && result.Count < 13)
                 {
                     while (result.Count < 13)
-                    {
                         result.Add("-");
-                    }
                     break;
                 }
             }
 
             while (result.Count < 13)
-            {
                 result.Add("");
-            }
 
             return result;
         }
 
-
         // PDF Export using QuestPDF
         public void SaveDisplayToPdf()
         {
-            string courseName = courseNameLabel.Text ?? "Course";
+            string courseName = courseNameLabel?.Text ?? "Course";
 
-            // ✅ NEW: Save to Proton Drive Golf folder for ANY Windows user
+            // Save to Proton Drive Golf folder for ANY Windows user
             string golfFolder = ProtonGolfFolder;
             Directory.CreateDirectory(golfFolder);
 
-            // Optional: keep same file name, or add timestamp to avoid overwriting
+            // Optional: add timestamp to avoid overwriting
             string filePath = Path.Combine(golfFolder, "GolfClubPlan.pdf");
 
             var tableRows = GetShotTableData();
@@ -695,9 +783,9 @@ namespace GolfClubSelectionApp
                                 bgColor = yellow;
                             else if (firstCell == "Strokes")
                                 bgColor = lightGreen;
-                            else if (firstCell.StartsWith("Yardage"))
+                            else if (firstCell.StartsWith("Yardage", StringComparison.Ordinal))
                                 bgColor = lightGreen;
-                            else if (firstCell.StartsWith("Stroke"))
+                            else if (firstCell.StartsWith("Stroke", StringComparison.Ordinal))
                                 bgColor = yellow;
 
                             for (int colIdx = 0; colIdx < row.Count; colIdx++)
@@ -712,14 +800,14 @@ namespace GolfClubSelectionApp
                             }
                         }
 
-                        PdfContainer CellStyle(PdfContainer container) =>
-                            container.PaddingVertical(1).PaddingHorizontal(2).AlignCenter();
+                        PdfContainer CellStyle(PdfContainer c) =>
+                            c.PaddingVertical(1).PaddingHorizontal(2).AlignCenter();
                     });
                 });
             })
             .GeneratePdf(filePath);
 
-            DisplayAlert("PDF Saved", $"PDF saved to:\n{filePath}", "OK");
+            _ = DisplayAlert("PDF Saved", $"PDF saved to:\n{filePath}", "OK");
         }
 
         private List<List<string>> GetShotTableData()
@@ -735,7 +823,8 @@ namespace GolfClubSelectionApp
 
             rows.Add(Enumerable.Repeat(string.Empty, totalColumns).ToList());
 
-            if (coursePicker.SelectedItem != null && courses.TryGetValue(coursePicker.SelectedItem.ToString(), out var course))
+            if (coursePicker?.SelectedItem is string courseName &&
+                courses.TryGetValue(courseName, out var course))
             {
                 var allHoleStrokes = new List<List<string>>();
                 for (var h = 0; h < 18; h++)
@@ -754,9 +843,7 @@ namespace GolfClubSelectionApp
                     rows.Add(strokeRow);
 
                     if (s < 5)
-                    {
                         rows.Add(Enumerable.Repeat(string.Empty, totalColumns).ToList());
-                    }
                 }
             }
 
@@ -773,8 +860,7 @@ namespace GolfClubSelectionApp
             SaveDisplayToPdf();
         }
 
-        // ✅ Proton Drive sync logic (replaces OneDrive references)
-        // If you later implement file copy/sync of ManagedFiles, use these paths.
+        // Proton Drive sync logic (replaces OneDrive references)
         private static string ProtonDriveBase => ProtonGolfFolder;
         private static readonly string[] ManagedFiles = { "ClubAndDistance.txt", "GolfCourseData.txt" };
 
@@ -787,7 +873,7 @@ namespace GolfClubSelectionApp
         // Call this on startup
         public async Task ImportFromProtonDriveAsync()
         {
-            MainThread.InvokeOnMainThreadAsync(async () => await _golfDataService.ImportDatabaseAsync());
+            await _golfDataService.ImportDatabaseAsync();
         }
     }
 }
