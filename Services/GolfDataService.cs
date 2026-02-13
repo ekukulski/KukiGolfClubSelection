@@ -21,18 +21,29 @@ namespace KukiGolfClubSelection.Services
         private const string CourseFileName = "GolfCourseData";
         private const string ClubFileName = "ClubAndDistance";
 
+        // Proton Drive constants (shared with KukiGolf)
+        private const string ProtonDriveFolder = "Proton Drive";
+        private const string ProtonAccountFolder = "ekukulski";
+        private const string ProtonMyFilesFolder = "My files";
+        private const string ProtonDataFolder = "Data";
+        private const string KukiGolfFolderName = "KukiGolf";
+
+        private const string ExportSubfolder = "Exports";
+        private const string ImportSubfolder = "Imports";
+        private const string ArchiveSubfolder = "Archive";
+
         public GolfDataService()
         {
             _courseFilePath = Path.Combine(FileSystem.AppDataDirectory, CourseFileName + ".txt");
             _clubFilePath = Path.Combine(FileSystem.AppDataDirectory, ClubFileName + ".txt");
 
-            // Proton Drive base:
-            // C:\Users\<AnyUser>\Proton Drive\ekukulski\My files\Data\KukiGolfClubSelection
+            // Proton Drive base - SHARED with KukiGolf:
+            // C:\Users\<AnyUser>\Proton Drive\ekukulski\My files\Data\KukiGolf
             var basePath = GetProtonDriveBasePath();
 
-            _exportFolderPath = Path.Combine(basePath, "Exports");
-            _importFolderPath = Path.Combine(basePath, "Imports");
-            _archiveFolderPath = Path.Combine(basePath, "Archive");
+            _exportFolderPath = Path.Combine(basePath, ExportSubfolder);
+            _importFolderPath = Path.Combine(basePath, ImportSubfolder);
+            _archiveFolderPath = Path.Combine(basePath, ArchiveSubfolder);
             _backupFolderPath = Path.Combine(FileSystem.AppDataDirectory, "Backups");
 
             Directory.CreateDirectory(_exportFolderPath);
@@ -42,8 +53,9 @@ namespace KukiGolfClubSelection.Services
         }
 
         /// <summary>
-        /// Builds the Proton Drive folder path for ANY Windows user:
-        /// C:\Users\<User>\Proton Drive\ekukulski\My files\Data\KukiGolfClubSelection
+        /// Builds the Proton Drive folder path for ANY Windows user.
+        /// SHARED WITH KukiGolf app:
+        /// C:\Users\<User>\Proton Drive\ekukulski\My files\Data\KukiGolf
         ///
         /// Folder name "ekukulski" is fixed and must not change.
         /// </summary>
@@ -54,11 +66,11 @@ namespace KukiGolfClubSelection.Services
 
             return Path.Combine(
                 userProfile,
-                "Proton Drive",
-                "ekukulski",          // MUST NOT CHANGE
-                "My files",
-                "Data",
-                "KukiGolfClubSelection"
+                ProtonDriveFolder,
+                ProtonAccountFolder,      // MUST NOT CHANGE
+                ProtonMyFilesFolder,
+                ProtonDataFolder,
+                KukiGolfFolderName        // SHARED with KukiGolf app
             );
         }
 
@@ -104,8 +116,8 @@ namespace KukiGolfClubSelection.Services
 
         private async Task<bool> ImportFileAsync(string localFilePath, string fileName)
         {
-            // NOTE: Your existing logic imports from _exportFolderPath using LATEST pointers.
-            // Keeping behavior unchanged—just the base path is now Proton Drive.
+            // ⚠️ CHANGE: Import from _exportFolderPath instead of _importFolderPath
+            // This allows reading files exported by KukiGolf app
             string latestPointer = Path.Combine(_exportFolderPath, $"LATEST_{fileName}.txt");
             string? fileToImport = null;
 
