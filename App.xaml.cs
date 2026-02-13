@@ -11,7 +11,7 @@ using Windows.Graphics;
 using WinRT.Interop;
 #endif
 
-namespace GolfClubSelectionApp
+namespace KukiGolfClubSelection
 {
     public partial class App : Application
     {

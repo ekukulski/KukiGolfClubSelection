@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="GolfClubSelectionApp.AddNewGolfCourse"
-             BackgroundColor="Black">
+             x:Class="KukiGolfClubSelection.AddNewGolfCourse">
 
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="16">
@@ -12,27 +11,27 @@
                    HorizontalOptions="Center"
                    FontAttributes="Bold"
                    FontSize="24"
-                   TextColor="FloralWhite"
+                   TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource FloralWhite}}"
                    Margin="0,0,0,10"/>
 
-            <!-- SECTION WITH FLORALWHITE TEXT + DARK ENTRY BACKGROUNDS -->
+            <!-- SECTION WITH THEME-AWARE TEXT + ENTRY BACKGROUNDS -->
             <StackLayout>
 
                 <StackLayout.Resources>
 
                     <!-- Applies to ALL Labels inside this section -->
                     <Style TargetType="Label">
-                        <Setter Property="TextColor" Value="FloralWhite" />
+                        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource FloralWhite}}" />
                     </Style>
 
                     <!-- Applies to ALL Entries inside this section -->
                     <Style TargetType="Entry">
                         <!-- Text -->
-                        <Setter Property="TextColor" Value="FloralWhite" />
-                        <Setter Property="PlaceholderColor" Value="FloralWhite" />
+                        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource FloralWhite}}" />
+                        <Setter Property="PlaceholderColor" Value="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource FloralWhite}}" />
 
-                        <!-- Dark background so text stands out -->
-                        <Setter Property="BackgroundColor" Value="#1E1E1E" />
+                        <!-- Background adapts to theme -->
+                        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Gainsboro}, Dark={StaticResource DarkGray}}" />
 
                         <!-- Optional polish -->
                         <Setter Property="HeightRequest" Value="40" />

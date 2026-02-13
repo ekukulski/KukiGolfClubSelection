@@ -1,6 +1,6 @@
 using Microsoft.Maui.Controls;
 
-namespace GolfClubSelectionApp
+namespace KukiGolfClubSelection
 {
     public partial class HomePage : ContentPage
     {

@@ -1,7 +1,6 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="GolfClubSelectionApp.ClubAndDistancePage"
-             BackgroundColor="Black">
+             x:Class="KukiGolfClubSelection.ClubAndDistancePage">
 
     <Grid Padding="20"
           RowDefinitions="Auto,*,Auto,Auto"
@@ -13,15 +12,15 @@
                HorizontalOptions="Center"
                FontAttributes="Bold"
                FontSize="24"
-               TextColor="FloralWhite"
+               TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource FloralWhite}}"
                Margin="0,0,0,10"/>
 
         <!-- Page-scoped styles -->
         <Grid.Resources>
             <Style TargetType="Entry">
-                <Setter Property="TextColor" Value="FloralWhite" />
-                <Setter Property="PlaceholderColor" Value="FloralWhite" />
-                <Setter Property="BackgroundColor" Value="#1E1E1E" />
+                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource FloralWhite}}" />
+                <Setter Property="PlaceholderColor" Value="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource FloralWhite}}" />
+                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Gainsboro}, Dark={StaticResource DarkGray}}" />
                 <Setter Property="HeightRequest" Value="40" />
                 <Setter Property="Margin" Value="0,2" />
             </Style>
@@ -53,13 +52,13 @@
                 Clicked="OnSaveClicked"
                 FontSize="24"
                 BackgroundColor="DarkSeaGreen"
-                TextColor="FloralWhite"/>
+                TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource FloralWhite}}"/>
 
         <Button Grid.Row="3"
                 Text="Return"
                 Clicked="OnReturnClicked"
                 FontSize="24"
                 BackgroundColor="IndianRed"
-                TextColor="FloralWhite"/>
+                TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource FloralWhite}}"/>
     </Grid>
 </ContentPage>

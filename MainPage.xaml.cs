@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using GolfClubSelectionApp.Models;
-using GolfClubSelectionApp.Services;
+using KukiGolfClubSelection.Models;
+using KukiGolfClubSelection.Services;
 using Microsoft.Maui.Controls;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
@@ -14,7 +14,7 @@ using MauiColors = Microsoft.Maui.Graphics.Colors;
 using PdfColors = QuestPDF.Helpers.Colors;
 using PdfContainer = QuestPDF.Infrastructure.IContainer;
 
-namespace GolfClubSelectionApp
+namespace KukiGolfClubSelection
 {
     public partial class MainPage : ContentPage
     {
@@ -283,9 +283,12 @@ namespace GolfClubSelectionApp
                 return;
             }
 
-            // Set course name label background color (light blue)
+            // Set course name label background color (light blue) and text color (black in both modes)
             if (courseNameLabel != null)
+            {
                 courseNameLabel.BackgroundColor = MauiColors.LightBlue;
+                courseNameLabel.TextColor = MauiColors.Black;  // Add this line - black text in both light and dark mode
+            }
 
             if (courseInfoPanel != null)
                 courseInfoPanel.IsVisible = true;
@@ -524,9 +527,11 @@ namespace GolfClubSelectionApp
                     SelectedIndex = changeClubSelections[i] == null
                         ? -1
                         : clubDistances.FindIndex(c => c.Club == changeClubSelections[i]),
-                    // ✅ FIX: FillAndExpand is obsolete in MAUI. In a Grid, use Fill (no Expand).
                     HorizontalOptions = LayoutOptions.Fill,
-                    BackgroundColor = MauiColors.Transparent
+                    // Use Gainsboro background in light mode, DarkGray in dark mode
+                    BackgroundColor = Application.Current?.RequestedTheme == AppTheme.Light 
+                        ? MauiColor.FromArgb("#DCDCDC") // Gainsboro
+                        : MauiColor.FromArgb("#2D2D2D")  // DarkGray
                 };
 
                 int holeIndex = i;

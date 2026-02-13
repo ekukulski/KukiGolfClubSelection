@@ -1,7 +1,6 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="GolfClubSelectionApp.HomePage"
-             BackgroundColor="Black">
+             x:Class="KukiGolfClubSelection.HomePage">
 
     <VerticalStackLayout Padding="20" Spacing="10">
 
@@ -10,28 +9,28 @@
            HorizontalOptions="Center"
            FontAttributes="Bold"
            FontSize="24"
-           TextColor="FloralWhite"
+           TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource FloralWhite}}"
            Margin="0,0,0,10"/>
 
         <Button Text="Add New Course"
                 Clicked="OnAddNewCourseClicked"
                 FontSize="24"
                 BackgroundColor="DarkSeaGreen"
-                TextColor="FloralWhite"/>
+                TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource FloralWhite}}"/>
         <Button Text="Club and Distance"
                 Clicked="OnClubAndDistanceClicked"
                 FontSize="24"
                 BackgroundColor="DarkSeaGreen"
-                TextColor="FloralWhite"/>
+                TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource FloralWhite}}"/>
         <Button Text="Club Selection"
                 Clicked="OnClubSelectionClicked"
                 FontSize="24"
                 BackgroundColor="DarkSeaGreen"
-                TextColor="FloralWhite"/>
+                TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource FloralWhite}}"/>
         <Button Text="Exit"
                 Clicked="OnExitClicked"
                 FontSize="24"
                 BackgroundColor="IndianRed"
-                TextColor="FloralWhite"/>
+                TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource FloralWhite}}"/>
     </VerticalStackLayout>
 </ContentPage>

@@ -1,5 +1,5 @@
 
-namespace GolfClubSelectionApp.Models;
+namespace KukiGolfClubSelection.Models;
 
 public class ClubRecommendation
 {
