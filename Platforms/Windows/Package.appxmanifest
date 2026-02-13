@@ -8,8 +8,8 @@
 
 	<Identity
 	  Name="maui-package-name-placeholder"
-	  Publisher="CN=KukiGolf"
-	  Version="1.0.6.0" />
+	  Publisher="CN=Edward Kukulski"
+	  Version="1.0.8.0" />
 
 	<mp:PhoneIdentity
 	  PhoneProductId="F4C3880B-8FC6-4EE5-B229-506D8C4580F1"
