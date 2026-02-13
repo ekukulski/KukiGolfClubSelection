@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="GolfClubSelectionApp.MainPage"
-             BackgroundColor="Black">
+             x:Class="KukiGolfClubSelection.MainPage">
 
     <ContentPage.Resources>
         <Style x:Key="TableLabelStyle" TargetType="Label">
-            <Setter Property="TextColor" Value="Black" />
+            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource FloralWhite}}" />
         </Style>
     </ContentPage.Resources>
 
@@ -21,7 +20,7 @@
                HorizontalOptions="Center"
                FontAttributes="Bold"
                FontSize="24"
-               TextColor="FloralWhite"
+               TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource FloralWhite}}"
                Margin="0,0,0,10" />
 
         <!-- No Expand needed: it will fill because the row is "*" -->
@@ -31,7 +30,6 @@
             <VerticalStackLayout Padding="20" Spacing="12">
 
                 <Picker x:Name="coursePicker"
-                        TextColor="FloralWhite"
                         Title="Select Course" />
 
                 <VerticalStackLayout x:Name="courseInfoPanel"
@@ -39,20 +37,16 @@
                                      Spacing="4">
                     <Label x:Name="courseNameLabel"
                            FontAttributes="Bold"
-                           FontSize="18"
-                           TextColor="FloralWhite" />
+                           FontSize="18" />
                     <Label x:Name="courseDetailsLabel"
-                           FontSize="14"
-                           TextColor="FloralWhite" />
+                           FontSize="14" />
                 </VerticalStackLayout>
 
                 <HorizontalStackLayout Spacing="8"
                                        VerticalOptions="Start">
                     <Label Text="Default Driver:"
-                           VerticalOptions="Center"
-                           TextColor="FloralWhite" />
+                           VerticalOptions="Center" />
                     <Picker x:Name="defaultDriverPicker"
-                            TextColor="FloralWhite"
                             WidthRequest="180"
                             VerticalOptions="Center" />
                 </HorizontalStackLayout>
@@ -61,7 +55,6 @@
                        FontAttributes="Bold"
                        FontSize="16"
                        HorizontalOptions="Center"
-                       TextColor="FloralWhite"
                        Margin="0,12,0,0" />
 
                 <!-- Replace FillAndExpand with a Grid -->

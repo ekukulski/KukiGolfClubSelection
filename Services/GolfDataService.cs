@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Maui.Storage;
 
-namespace GolfClubSelectionApp.Services
+namespace KukiGolfClubSelection.Services
 {
     public class GolfDataService
     {
@@ -27,7 +27,7 @@ namespace GolfClubSelectionApp.Services
             _clubFilePath = Path.Combine(FileSystem.AppDataDirectory, ClubFileName + ".txt");
 
             // Proton Drive base:
-            // C:\Users\<AnyUser>\Proton Drive\ekukulski\My files\Data\GolfClubSelectionApp
+            // C:\Users\<AnyUser>\Proton Drive\ekukulski\My files\Data\KukiGolfClubSelection
             var basePath = GetProtonDriveBasePath();
 
             _exportFolderPath = Path.Combine(basePath, "Exports");
@@ -43,7 +43,7 @@ namespace GolfClubSelectionApp.Services
 
         /// <summary>
         /// Builds the Proton Drive folder path for ANY Windows user:
-        /// C:\Users\<User>\Proton Drive\ekukulski\My files\Data\GolfClubSelectionApp
+        /// C:\Users\<User>\Proton Drive\ekukulski\My files\Data\KukiGolfClubSelection
         ///
         /// Folder name "ekukulski" is fixed and must not change.
         /// </summary>
@@ -58,7 +58,7 @@ namespace GolfClubSelectionApp.Services
                 "ekukulski",          // MUST NOT CHANGE
                 "My files",
                 "Data",
-                "GolfClubSelectionApp"
+                "KukiGolfClubSelection"
             );
         }
 

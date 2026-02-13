@@ -44,7 +44,7 @@ STEP 1: Install the Certificate
 --------------------------------
 The certificate is required to trust the application package.
 
-1. Locate "GolfClubSelectionApp_1.0.0.0_x64.cer" in the extracted folder
+1. Locate "KukiGolfClubSelection_1.0.0.0_x64.cer" in the extracted folder
 
 2. Double-click the .cer file
 
@@ -64,7 +64,7 @@ The certificate is required to trust the application package.
 
 STEP 2: Install the Application
 ---------------------------------
-1. Locate "GolfClubSelectionApp_1.0.0.0_x64.msix" in the extracted folder
+1. Locate "KukiGolfClubSelection_1.0.0.0_x64.msix" in the extracted folder
 
 2. Double-click the .msix file
 
@@ -102,7 +102,7 @@ within your Proton Drive:
 
 C:\Users\[YourUsername]\Proton Drive\ekukulski\My files\
 ├── Data\
-│   └── GolfClubSelectionApp\
+│   └── KukiGolfClubSelection\
 │       ├── Exports\      (Database exports with timestamps)
 │       ├── Imports\      (Reserved for future use)
 │       └── Archive\      (Archived data files)
@@ -211,7 +211,7 @@ APPLICATION DATA LOCATIONS
 LOCAL APP DATA:
 ---------------
 C:\Users\[YourUsername]\AppData\Local\Packages\
-  com.kukigolf.golfclubselectionapp_[packagehash]\LocalState\
+  com.kukigolf.KukiGolfClubSelection_[packagehash]\LocalState\
   ├── GolfCourseData.txt    (Course information)
   ├── ClubAndDistance.txt   (Your club distances)
   └── Backups\              (Local backup files)
@@ -219,7 +219,7 @@ C:\Users\[YourUsername]\AppData\Local\Packages\
 PROTON DRIVE SYNC:
 ------------------
 C:\Users\[YourUsername]\Proton Drive\ekukulski\My files\
-  ├── Data\GolfClubSelectionApp\
+  ├── Data\KukiGolfClubSelection\
   │   └── Exports\          (Timestamped database exports)
   └── Documents\Golf\
       └── GolfClubPlan.pdf  (Latest PDF export)
@@ -366,7 +366,7 @@ Your data files remain after uninstall for safety. To completely remove:
 Local App Data:
 1. Press Windows key + R
 2. Type: %localappdata%\Packages
-3. Find and delete folder starting with "com.kukigolf.golfclubselectionapp"
+3. Find and delete folder starting with "com.kukigolf.KukiGolfClubSelection"
 
 Proton Drive Data (keeps data synced across devices):
 - Leave in Proton Drive if you plan to reinstall or use on other devices
@@ -450,7 +450,7 @@ ADVANCED FEATURES
 DATA BACKUP & RESTORE:
 ----------------------
 - Automatic backups created in LocalState\Backups\ folder
-- Timestamped exports saved to Proton Drive\ekukulski\My files\Data\GolfClubSelectionApp\Exports\
+- Timestamped exports saved to Proton Drive\ekukulski\My files\Data\KukiGolfClubSelection\Exports\
 - LATEST_* files point to most recent successful export
 - Manual restore: Copy .txt files from Exports to LocalState folder
 
@@ -536,7 +536,7 @@ SUPPORT & CONTACT
 For questions, issues, or feedback:
 
 Developer: KukiGolf
-GitHub: https://github.com/ekukulski/GolfClubSelectionApp
+GitHub: https://github.com/ekukulski/KukiGolfClubSelection
 Email: [Your Email Address]
 
 Application Information:

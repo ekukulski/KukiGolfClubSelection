@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace GolfClubSelectionApp
+namespace KukiGolfClubSelection
 {
     public static class MauiProgram
     {

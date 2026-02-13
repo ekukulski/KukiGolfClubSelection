@@ -2,11 +2,11 @@
 using System;
 using System.IO;
 using System.Linq;
-using GolfClubSelectionApp.Services;
+using KukiGolfClubSelection.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace GolfClubSelectionApp
+namespace KukiGolfClubSelection
 {
     public partial class AddNewGolfCourse : ContentPage
     {

@@ -1,8 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
-using GolfClubSelectionApp.Services;
+using KukiGolfClubSelection.Services;
 
-namespace GolfClubSelectionApp
+namespace KukiGolfClubSelection
 {
     public partial class ClubAndDistancePage : ContentPage
     {
